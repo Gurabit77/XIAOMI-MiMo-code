@@ -1,4 +1,4 @@
-# MiMo Code
+# XIAOMI MiMo Code
 
 > 小米 MiMo 模型的专属 AI 编程助手，在终端里输入 `mimo` 即可使用。
 
@@ -23,12 +23,12 @@ MiMo Code 是一个运行在终端里的 AI 编程助手。你在终端输入 `m
 
 ### 能做什么
 
-- 🔧 **写代码** — "帮我写一个 Python 快速排序"
-- 🐛 **修 bug** — "这个函数为什么报错，帮我修"
-- 📖 **读项目** — "解释一下这个项目的架构"
-- 🖥️ **跑命令** — "帮我部署到服务器上"
-- 📝 **改文件** — 直接编辑你的代码文件，改完你确认
-- 🔍 **搜代码** — 在整个项目里搜索函数、变量、文件
+- **写代码** — "帮我写一个 Python 快速排序"
+-  **修 bug** — "这个函数为什么报错，帮我修"
+-  **读项目** — "解释一下这个项目的架构"
+-  **跑命令** — "帮我部署到服务器上"
+-  **改文件** — 直接编辑你的代码文件，改完你确认
+-  **搜代码** — 在整个项目里搜索函数、变量、文件
 
 ### 和 ChatGPT / Claude 的区别
 
@@ -55,8 +55,8 @@ MiMo Code 是一个运行在终端里的 AI 编程助手。你在终端输入 `m
 
 ```bash
 # 克隆项目
-git clone https://github.com/你的用户名/mimo-code.git
-cd mimo-code
+git clone https://github.com/Gurabit77/XIAOMI-MiMo-code.git
+cd XIAOMI-MiMo-code
 
 # 安装依赖
 bun install
@@ -72,12 +72,14 @@ npm link
 
 去 [MiMo 订阅管理](https://platform.xiaomimimo.com/#/console/subscription) 获取你的 API Key（`tp-` 开头）。
 
+然后设置环境变量：
+
 ```bash
 # 加到你的 ~/.zshrc 或 ~/.bashrc
 export MIMO_API_KEY="tp-你的key"
 ```
 
-> 详细配置说明（模型选择、集群切换、故障排除等）请参见 [docs/SETUP.md](docs/SETUP.md)
+或者直接编辑 `src/entrypoints/mimo-bootstrap.ts` 里的默认 key。
 
 ### 4. 使用
 
