@@ -56,7 +56,7 @@ export function PreflightStep({
         !result?.success &&
         !isChecking && (
           <Box flexDirection="column" gap={1}>
-            <Text color="error">Unable to connect to Anthropic services</Text>
+            <Text color="error">Unable to connect to MiMo services</Text>
             <Text color="error">{result?.error}</Text>
           </Box>
         )

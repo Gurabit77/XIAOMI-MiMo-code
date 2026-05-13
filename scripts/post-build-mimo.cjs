@@ -86,6 +86,20 @@ const replacements = [
   // === Generic "Claude to" patterns in UI text ===
   ["Claude to read CI results", "MiMo to read CI results"],
 
+  // === Anthropic branding in UI ===
+  ["Anthropic Compatible Setup", "MiMo Compatible Setup"],
+  ["Anthropic Compatible \\xB7", "MiMo Compatible \\xB7"],
+  ["Anthropic Compatible \xB7", "MiMo Compatible \xB7"],
+  ["Anthropic Console account \xB7", "MiMo API account \xB7"],
+  ["Anthropic Console account \\xB7", "MiMo API account \\xB7"],
+  ["API Usage Billing (Anthropic Console)", "API Usage Billing (MiMo API)"],
+  ["Use Anthropic Console (API usage billing) instead of Claude subscription", "Use MiMo API (API usage billing) instead of MiMo subscription"],
+  ["Use Claude subscription (default)", "Use MiMo subscription (default)"],
+  ["requires Claude subscription", "requires MiMo subscription"],
+  ["your Claude subscription or billed based on API usage through your Console account", "your MiMo subscription or billed based on API usage through your API account"],
+  ["Claude account with subscription", "MiMo account with subscription"],
+  ["Sign in to your Anthropic account", "Sign in to your MiMo account"],
+
   // === Shell/install scripts ===
   ['$HOME/.local/bin/claude', '$HOME/.local/bin/mimo'],
   ['.local/bin/claude")', '.local/bin/mimo")'],

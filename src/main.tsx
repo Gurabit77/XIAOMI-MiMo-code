@@ -6085,7 +6085,7 @@ async function run(): Promise<CommanderCommand> {
 		.configureHelp(createSortedHelpConfig());
 
 	auth.command("login")
-		.description("Sign in to your Anthropic account")
+		.description("Sign in to your MiMo account")
 		.option(
 			"--email <email>",
 			"Pre-populate email address on the login page",
@@ -6093,9 +6093,9 @@ async function run(): Promise<CommanderCommand> {
 		.option("--sso", "Force SSO login flow")
 		.option(
 			"--console",
-			"Use Anthropic Console (API usage billing) instead of Claude subscription",
+			"Use MiMo API (API usage billing) instead of MiMo subscription",
 		)
-		.option("--claudeai", "Use Claude subscription (default)")
+		.option("--claudeai", "Use MiMo subscription (default)")
 		.action(
 			async ({
 				email,
@@ -6123,7 +6123,7 @@ async function run(): Promise<CommanderCommand> {
 		});
 
 	auth.command("logout")
-		.description("Log out from your Anthropic account")
+		.description("Log out from your MiMo account")
 		.action(async () => {
 			const { authLogout } = await import("./cli/handlers/auth.js");
 			await authLogout();
@@ -6370,7 +6370,7 @@ async function run(): Promise<CommanderCommand> {
   program
     .command('setup-token')
     .description(
-      'Set up a long-lived authentication token (requires Claude subscription)',
+      'Set up a long-lived authentication token (requires MiMo subscription)',
     )
     .action(async () => {
       const [{ setupTokenHandler }, { createRoot }] = await Promise.all([

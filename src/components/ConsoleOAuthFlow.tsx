@@ -80,7 +80,7 @@ export function ConsoleOAuthFlow({
     forceLoginMethod === 'claudeai'
       ? 'Login method pre-selected: Subscription Plan (MiMo Token Plan)'
       : forceLoginMethod === 'console'
-        ? 'Login method pre-selected: API Usage Billing (Anthropic Console)'
+        ? 'Login method pre-selected: API Usage Billing (MiMo API)'
         : null
 
   const terminal = useTerminalNotification()
@@ -445,7 +445,7 @@ function OAuthStatusMessage({
           <Text bold>
             {startingMessage
               ? startingMessage
-              : `MiMo Code can be used with your Claude subscription or billed based on API usage through your Console account.`}
+              : `MiMo Code can be used with your MiMo subscription or billed based on API usage through your API account.`}
           </Text>
 
           <Text>Select login method:</Text>
@@ -456,7 +456,7 @@ function OAuthStatusMessage({
                 {
                   label: (
                     <Text>
-                      Anthropic Compatible ·{' '}
+                      MiMo Compatible ·{' '}
                       <Text dimColor>Configure your own API endpoint</Text>
                       {'\n'}
                     </Text>
@@ -488,7 +488,7 @@ function OAuthStatusMessage({
                 {
                   label: (
                     <Text>
-                      Claude account with subscription ·{' '}
+                      MiMo account with subscription ·{' '}
                       <Text dimColor>Pro, Max, Team, or Enterprise</Text>
                       {process.env.USER_TYPE === 'ant' && (
                         <Text>
@@ -509,7 +509,7 @@ function OAuthStatusMessage({
                 {
                   label: (
                     <Text>
-                      Anthropic Console account ·{' '}
+                      MiMo API account ·{' '}
                       <Text dimColor>API usage billing</Text>
                       {'\n'}
                     </Text>
@@ -788,7 +788,7 @@ function OAuthStatusMessage({
 
         return (
           <Box flexDirection="column" gap={1}>
-            <Text bold>Anthropic Compatible Setup</Text>
+            <Text bold>MiMo Compatible Setup</Text>
             <Box flexDirection="column" gap={1}>
               {renderRow('base_url', 'Base URL ')}
               {renderRow('api_key', 'API Key  ', { mask: true })}
