@@ -230,9 +230,9 @@ function PermissionRulesTab({
       <Text>
         {
           {
-            allow: "Claude Code won't ask before using allowed tools.",
-            ask: 'Claude Code will always ask for confirmation before using these tools.',
-            deny: 'Claude Code will always reject requests to use denied tools.',
+            allow: "MiMo Code won't ask before using allowed tools.",
+            ask: 'MiMo Code will always ask for confirmation before using these tools.',
+            deny: 'MiMo Code will always reject requests to use denied tools.',
           }[tab]
         }
       </Text>
@@ -753,7 +753,7 @@ export function PermissionRuleList({
           <Tab id="workspace" title="Workspace">
             <Box flexDirection="column">
               <Text>
-                Claude Code can read files in the workspace, and make edits when
+                MiMo Code can read files in the workspace, and make edits when
                 auto-accept edits is on.
               </Text>
               <WorkspaceTab

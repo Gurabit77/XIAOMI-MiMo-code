@@ -78,7 +78,7 @@ export function ConsoleOAuthFlow({
   const orgUUID = settings.forceLoginOrgUUID
   const forcedMethodMessage =
     forceLoginMethod === 'claudeai'
-      ? 'Login method pre-selected: Subscription Plan (Claude Pro/Max)'
+      ? 'Login method pre-selected: Subscription Plan (MiMo Token Plan)'
       : forceLoginMethod === 'console'
         ? 'Login method pre-selected: API Usage Billing (Anthropic Console)'
         : null
@@ -272,12 +272,12 @@ export function ConsoleOAuthFlow({
           throw new Error((orgResult as { valid: false; message: string }).message)
         }
         // Reset modelType to anthropic when using OAuth login
-        updateSettingsForSource('userSettings', { modelType: 'anthropic' } as any)
+        updateSettingsForSource('userSettings', { modelType: 'anthropic' })
 
         setOAuthStatus({ state: 'success' })
         void sendNotification(
           {
-            message: 'Claude Code login successful',
+            message: 'MiMo Code login successful',
             notificationType: 'auth_success',
           },
           terminal,
@@ -445,7 +445,7 @@ function OAuthStatusMessage({
           <Text bold>
             {startingMessage
               ? startingMessage
-              : `Claude Code can be used with your Claude subscription or billed based on API usage through your Console account.`}
+              : `MiMo Code can be used with your Claude subscription or billed based on API usage through your Console account.`}
           </Text>
 
           <Text>Select login method:</Text>
@@ -677,9 +677,9 @@ function OAuthStatusMessage({
           if (finalVals.sonnet_model) env.ANTHROPIC_DEFAULT_SONNET_MODEL = finalVals.sonnet_model
           if (finalVals.opus_model) env.ANTHROPIC_DEFAULT_OPUS_MODEL = finalVals.opus_model
           const { error } = updateSettingsForSource('userSettings', {
-            modelType: 'anthropic' as any,
+            modelType: 'anthropic',
             env,
-          } as any)
+          })
           if (error) {
             setOAuthStatus({
               state: 'error',
@@ -897,9 +897,9 @@ function OAuthStatusMessage({
           if (finalVals.sonnet_model) env.OPENAI_DEFAULT_SONNET_MODEL = finalVals.sonnet_model
           if (finalVals.opus_model) env.OPENAI_DEFAULT_OPUS_MODEL = finalVals.opus_model
           const { error } = updateSettingsForSource('userSettings', {
-            modelType: 'openai' as any,
+            modelType: 'openai',
             env,
-          } as any)
+          })
           if (error) {
             setOAuthStatus({
               state: 'error',
@@ -1130,9 +1130,9 @@ function OAuthStatusMessage({
           if (finalVals.sonnet_model) env.GEMINI_DEFAULT_SONNET_MODEL = finalVals.sonnet_model
           if (finalVals.opus_model) env.GEMINI_DEFAULT_OPUS_MODEL = finalVals.opus_model
           const { error } = updateSettingsForSource('userSettings', {
-            modelType: 'gemini' as any,
+            modelType: 'gemini',
             env,
-          } as any)
+          })
           if (error) {
             setOAuthStatus({
               state: 'error',
@@ -1282,7 +1282,7 @@ function OAuthStatusMessage({
 
           <Box flexDirection="column" gap={1}>
             <Text>
-              Claude Code supports Amazon Bedrock, Microsoft Foundry, and Vertex
+              MiMo Code supports Amazon Bedrock, Microsoft Foundry, and Vertex
               AI. Set the required environment variables, then restart Claude
               Code.
             </Text>
@@ -1363,7 +1363,7 @@ function OAuthStatusMessage({
         <Box flexDirection="column" gap={1}>
           <Box>
             <Spinner />
-            <Text>Creating API key for Claude Code…</Text>
+            <Text>Creating API key for MiMo Code…</Text>
           </Box>
         </Box>
       )

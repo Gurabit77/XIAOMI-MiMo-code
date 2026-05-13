@@ -1,5 +1,5 @@
 /**
- * ACP Agent implementation — bridges ACP protocol methods to Claude Code's
+ * ACP Agent implementation — bridges ACP protocol methods to MiMo Code's
  * internal QueryEngine / query() pipeline.
  *
  * Architecture: Uses internal QueryEngine (not @anthropic-ai/claude-agent-sdk)
@@ -115,7 +115,7 @@ export class AcpAgent implements Agent {
       protocolVersion: 1,
       agentInfo: {
         name: 'claude-code',
-        title: 'Claude Code',
+        title: 'MiMo Code',
         version:
           typeof (globalThis as unknown as Record<string, unknown>).MACRO ===
             'object' &&

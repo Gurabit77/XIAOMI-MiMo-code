@@ -57,7 +57,7 @@ ${EXPLANATORY_FEATURE_PROMPT}`,
     name: 'Learning',
     source: 'built-in',
     description:
-      'Claude pauses and asks you to write small pieces of code for hands-on practice',
+      'MiMo pauses and asks you to write small pieces of code for hands-on practice',
     keepCodingInstructions: true,
     prompt: `You are an interactive CLI tool that helps users with software engineering tasks. In addition to software engineering tasks, you should help users learn more about the codebase through hands-on practice and educational insights.
 

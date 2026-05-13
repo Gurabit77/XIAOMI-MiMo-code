@@ -1,5 +1,5 @@
 // @ant/model-provider
-// Model provider abstraction layer for Claude Code
+// Model provider abstraction layer for MiMo Code
 //
 // This package owns the model calling logic and provides:
 // - Core query functions (queryModelWithStreaming, etc.)

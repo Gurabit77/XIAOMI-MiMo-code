@@ -6,7 +6,7 @@ import { Select } from './CustomSelect/index.js'
 
 // NOTE: This copy is legally reviewed — do not modify without Legal team approval.
 export const AUTO_MODE_DESCRIPTION =
-  "Auto mode lets Claude handle permission prompts automatically — Claude checks each tool call for risky actions and prompt injection before executing. Actions Claude identifies as safe are executed, while actions Claude identifies as risky are blocked and Claude may try a different approach. Ideal for long-running tasks. Sessions are slightly more expensive. Claude can make mistakes that allow harmful commands to run, it's recommended to only use in isolated environments. Shift+Tab to change mode."
+  "Auto mode lets MiMo handle permission prompts automatically — MiMo checks each tool call for risky actions and prompt injection before executing. Actions MiMo identifies as safe are executed, while actions MiMo identifies as risky are blocked and MiMo may try a different approach. Ideal for long-running tasks. Sessions are slightly more expensive. MiMo can make mistakes that allow harmful commands to run, it's recommended to only use in isolated environments. Shift+Tab to change mode."
 
 type Props = {
   onAccept(): void

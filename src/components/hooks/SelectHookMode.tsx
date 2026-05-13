@@ -50,7 +50,7 @@ export function SelectHookMode({
         <Box flexDirection="column" gap={1}>
           <Text dimColor>No hooks configured for this event.</Text>
           <Text dimColor>
-            To add hooks, edit settings.json directly or ask Claude.
+            To add hooks, edit settings.json directly or ask MiMo.
           </Text>
         </Box>
       </Dialog>

@@ -161,7 +161,7 @@ export function UserTextMessage({
     }
   }
 
-  // Cross-session UDS message (from another Claude session's SendMessage).
+  // Cross-session UDS message (from another MiMo session's SendMessage).
   // CROSS_SESSION_MESSAGE_TAG is inlined so the import doesn't ship in
   // external builds where feature('UDS_INBOX') is false.
   if (feature('UDS_INBOX')) {

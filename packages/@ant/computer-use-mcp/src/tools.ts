@@ -500,7 +500,7 @@ export function buildComputerUseTools(
         "Supported agents: claude (runs 'claude'), codex (runs 'codex'), gemini (runs 'gemini'), " +
         "or any custom command. After launching, the tool binds to the new terminal window " +
         "and takes a screenshot to verify the agent started successfully. " +
-        "Use this when the user says: 'open Claude Code', 'start a Codex terminal', 'launch Gemini', etc.",
+        "Use this when the user says: 'open MiMo Code', 'start a Codex terminal', 'launch Gemini', etc.",
       inputSchema: {
         type: "object" as const,
         properties: {

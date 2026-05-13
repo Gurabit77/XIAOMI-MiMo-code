@@ -41,7 +41,7 @@ export function TranscriptSharePrompt({
         <Text color="ansi:cyan">{BLACK_CIRCLE} </Text>
         <Text bold>
           Can Anthropic look at your session transcript to help us improve
-          Claude Code?
+          MiMo Code?
         </Text>
       </Box>
 

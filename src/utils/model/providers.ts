@@ -1,8 +1,10 @@
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '../../services/analytics/index.js'
 import { getInitialSettings } from '../settings/settings.js'
 import { isEnvTruthy } from '../envUtils.js'
+import { isMiMoRuntime } from '../mimoRuntimeConfig.js'
 
 export type APIProvider =
+  | 'mimo'
   | 'firstParty'
   | 'bedrock'
   | 'vertex'
@@ -12,6 +14,8 @@ export type APIProvider =
   | 'grok'
 
 export function getAPIProvider(): APIProvider {
+  if (isMiMoRuntime()) return 'mimo'
+
   const modelType = getInitialSettings().modelType
   if (modelType === 'openai') return 'openai'
   if (modelType === 'gemini') return 'gemini'
@@ -38,6 +42,8 @@ export function getAPIProviderForStatsig(): AnalyticsMetadata_I_VERIFIED_THIS_IS
  * (or api-staging.anthropic.com for ant users).
  */
 export function isFirstPartyAnthropicBaseUrl(): boolean {
+  if (isMiMoRuntime()) return false
+
   const baseUrl = process.env.ANTHROPIC_BASE_URL
   // TODO: 这里会有问题, 只配置了 openai 协议的用户, 按理说会为 true 导致问题
   if (!baseUrl) {

@@ -13,7 +13,7 @@
  */
 
 import { readdir, readFile } from "fs/promises"
-import { join, resolve, dirname } from "path"
+import { dirname, join, normalize, resolve } from "path"
 import { fileURLToPath } from "url"
 
 // ─── 从 package.json 读取 dependencies 作为白名单 ────────────────
@@ -73,6 +73,10 @@ const NODE_18_PLUS_BUILTINS = new Set(["undici"])
 // Bun 专用模块（仅在 Bun 运行时可用，Node.js 环境会失败）
 const BUN_MODULES = new Set(["bun", "bun:ffi", "bun:test", "bun:sqlite"])
 
+// Optional native packages that libraries probe inside try/catch. They are not
+// hard runtime dependencies of the bundle entry point.
+const OPTIONAL_NATIVE_MODULE_PREFIXES = ["@img/sharp-"]
+
 // macOS JXA / native 框架（通过 ObjC.import，非真正的 require）
 const NATIVE_FRAMEWORKS = new Set(["AppKit", "CoreGraphics", "Foundation", "UIKit"])
 
@@ -103,7 +107,7 @@ async function main() {
   // 1. 列出所有 chunk 文件
   let files: string[]
   try {
-    files = (await readdir(distDir)).filter((f) => f.endsWith(".js"))
+    files = await listJavaScriptFiles(distDir)
   } catch {
     console.error(`❌ 无法读取目录: ${distDir}`)
     console.error("   请先运行 bun run build")
@@ -119,7 +123,7 @@ async function main() {
   for (const file of files) {
     const filePath = join(distDir, file)
     const content = await readFile(filePath, "utf-8")
-    const lines = content.split("\n")
+    const lines = stripBlockCommentsPreservingLines(content).split("\n")
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]
@@ -129,8 +133,7 @@ async function main() {
       const staticImportMatches = line.matchAll(STATIC_IMPORT_RE)
       for (const m of staticImportMatches) {
         const ref = m[1]
-        // 提取文件名部分（去掉 ./）
-        const refFile = ref.replace(/^\.\//, "")
+        const refFile = resolveBundleRef(file, ref)
         if (!fileSet.has(refFile)) {
           findings.push({
             type: "broken-chunk-ref",
@@ -149,6 +152,7 @@ async function main() {
         const mod = m[1]
         // 跳过 ObjC.import（JXA 语法，不是真正的 require）
         if (NATIVE_FRAMEWORKS.has(mod)) continue
+        if (isOptionalNativeModule(mod)) continue
         if (NODE_BUILTINS.has(mod) || NODE_18_PLUS_BUILTINS.has(mod) || PKG_DEPS.has(mod) || mod.startsWith("node:")) continue
         if (BUN_MODULES.has(mod)) {
           findings.push({
@@ -176,10 +180,25 @@ async function main() {
       const dynImportMatches = line.matchAll(DYNAMIC_IMPORT_RE)
       for (const m of dynImportMatches) {
         const mod = m[1]
-        // 跳过内部 chunk 引用和相对路径
-        if (mod.startsWith("./") || mod.startsWith("../")) continue
+        if (mod.startsWith("./") || mod.startsWith("../")) {
+          if (mod.endsWith(".js")) {
+            const refFile = resolveBundleRef(file, mod)
+            if (!fileSet.has(refFile)) {
+              findings.push({
+                type: "broken-chunk-ref",
+                severity: "error",
+                file,
+                line: lineNum,
+                module: mod,
+                snippet: line.trim().slice(0, 120),
+              })
+            }
+          }
+          continue
+        }
         // 跳过 ObjC.import
         if (NATIVE_FRAMEWORKS.has(mod)) continue
+        if (isOptionalNativeModule(mod)) continue
         if (NODE_BUILTINS.has(mod) || NODE_18_PLUS_BUILTINS.has(mod) || PKG_DEPS.has(mod) || mod.startsWith("node:")) continue
         if (BUN_MODULES.has(mod)) {
           // bun:test 等只在 Bun 运行时可用，Node.js 运行时会失败
@@ -209,6 +228,7 @@ async function main() {
       for (const m of nodeRequireMatches) {
         const mod = m[1]
         if (NATIVE_FRAMEWORKS.has(mod)) continue
+        if (isOptionalNativeModule(mod)) continue
         if (NODE_BUILTINS.has(mod) || NODE_18_PLUS_BUILTINS.has(mod) || PKG_DEPS.has(mod) || mod.startsWith("node:")) continue
         if (BUN_MODULES.has(mod)) {
           findings.push({
@@ -317,6 +337,37 @@ async function main() {
   }
 
   process.exit(errors.length > 0 ? 1 : 0)
+}
+
+async function listJavaScriptFiles(
+  root: string,
+  dir = root,
+): Promise<string[]> {
+  const entries = await readdir(dir, { withFileTypes: true })
+  const files: string[] = []
+  for (const entry of entries) {
+    const path = join(dir, entry.name)
+    if (entry.isDirectory()) {
+      files.push(...(await listJavaScriptFiles(root, path)))
+    } else if (entry.isFile() && entry.name.endsWith(".js")) {
+      files.push(normalize(path.slice(root.length + 1)))
+    }
+  }
+  return files.sort()
+}
+
+function resolveBundleRef(fromFile: string, ref: string): string {
+  return normalize(join(dirname(fromFile), ref))
+}
+
+function stripBlockCommentsPreservingLines(content: string): string {
+  return content.replace(/\/\*[\s\S]*?\*\//g, match =>
+    match.replace(/[^\n]/g, " "),
+  )
+}
+
+function isOptionalNativeModule(mod: string): boolean {
+  return OPTIONAL_NATIVE_MODULE_PREFIXES.some(prefix => mod.startsWith(prefix))
 }
 
 function groupByModule(items: Finding[]): Map<string, Finding[]> {

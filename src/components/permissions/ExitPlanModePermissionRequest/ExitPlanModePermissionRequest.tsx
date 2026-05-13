@@ -854,7 +854,7 @@ export function ExitPlanModePermissionRequest({
       >
         <Box flexDirection="column" marginTop={1}>
           <Box paddingX={1} flexDirection="column">
-            <Text>Here is Claude&apos;s plan:</Text>
+            <Text>Here is MiMo&apos;s plan:</Text>
           </Box>
           <Box
             borderColor="subtle"
@@ -993,7 +993,7 @@ export function buildPlanApprovalOptions({
 
   if (showUltraplan) {
     options.push({
-      label: 'No, refine with Ultraplan on Claude Code on the web',
+      label: 'No, refine with Ultraplan on MiMo Code on the web',
       value: 'ultraplan',
     })
   }
@@ -1002,7 +1002,7 @@ export function buildPlanApprovalOptions({
     type: 'input',
     label: 'No, keep planning',
     value: 'no',
-    placeholder: 'Tell Claude what to change',
+    placeholder: 'Tell MiMo what to change',
     description: 'shift+tab to approve with this feedback',
     onChange: onFeedbackChange,
   })

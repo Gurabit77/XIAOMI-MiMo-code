@@ -38,7 +38,7 @@ function formatPermissionRequestMessage(
   request: ChannelPermissionRequestParams,
 ): string {
   return [
-    'Claude Code needs your approval.',
+    'MiMo Code needs your approval.',
     '',
     `Tool: ${request.tool_name}`,
     `Reason: ${request.description}`,
@@ -110,7 +110,7 @@ export function createWeixinMcpServer(version: string): Server {
         content: [
           {
             type: 'text',
-            text: 'WeChat not connected. Run `ccb weixin login` first.',
+            text: 'WeChat not connected. Run `mimo weixin login` first.',
           },
         ],
         isError: true,
@@ -238,7 +238,7 @@ export async function runWeixinMcpServer(
   const account = loadAccount()
   if (!account) {
     process.stderr.write(
-      '[weixin] No account configured. Run `ccb weixin login` to connect your WeChat account.\n',
+      '[weixin] No account configured. Run `mimo weixin login` to connect your WeChat account.\n',
     )
     await Promise.all([deps.shutdown1PEventLogging(), deps.shutdownDatadog()])
     process.exit(1)

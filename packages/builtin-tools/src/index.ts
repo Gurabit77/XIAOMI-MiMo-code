@@ -1,4 +1,4 @@
-// builtin-tools — All tool implementations for Claude Code
+// builtin-tools — All tool implementations for MiMo Code
 // This barrel file re-exports the main tool constants and utilities.
 // For specific submodules, use deep imports: 'builtin-tools/tools/XTool/XTool.js'
 

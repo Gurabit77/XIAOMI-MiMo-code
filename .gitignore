@@ -3,6 +3,8 @@ node_modules
 dist
 coverage
 .env
+mimo.config.json
+mimo.config.local.json
 *.log
 .idea
 .vscode

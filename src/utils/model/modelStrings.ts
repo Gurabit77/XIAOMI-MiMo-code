@@ -23,6 +23,23 @@ export type ModelStrings = Record<ModelKey, string>
 const MODEL_KEYS = Object.keys(ALL_MODEL_CONFIGS) as ModelKey[]
 
 function getBuiltinModelStrings(provider: APIProvider): ModelStrings {
+  if (provider === 'mimo') {
+    return {
+      haiku35: 'mimo-v2.5',
+      haiku45: 'mimo-v2.5',
+      sonnet35: 'mimo-v2.5',
+      sonnet37: 'mimo-v2.5',
+      sonnet40: 'mimo-v2.5',
+      sonnet45: 'mimo-v2.5',
+      sonnet46: 'mimo-v2.5',
+      opus40: 'mimo-v2.5-pro',
+      opus41: 'mimo-v2.5-pro',
+      opus45: 'mimo-v2.5-pro',
+      opus46: 'mimo-v2.5-pro',
+      opus47: 'mimo-v2.5-pro',
+    }
+  }
+
   const out = {} as ModelStrings
   for (const key of MODEL_KEYS) {
     out[key] = ALL_MODEL_CONFIGS[key][provider]

@@ -16,7 +16,7 @@ export const call: LocalCommandCall = async (_args, _context) => {
   lines.push('')
 
   if (peers.length === 0) {
-    lines.push('No other Claude Code peers found.')
+    lines.push('No other MiMo Code peers found.')
   } else {
     lines.push(`Peers (${peers.length}):`)
     lines.push('')

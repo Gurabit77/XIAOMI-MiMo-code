@@ -93,6 +93,10 @@ export function modelSupportsThinking(model: string): boolean {
   if (supported3P !== undefined) {
     return supported3P
   }
+  const provider = getAPIProvider()
+  if (provider === 'mimo') {
+    return false
+  }
   if (process.env.USER_TYPE === 'ant') {
     if (resolveAntModel(model.toLowerCase())) {
       return true
@@ -101,7 +105,6 @@ export function modelSupportsThinking(model: string): boolean {
   // IMPORTANT: Do not change thinking support without notifying the model
   // launch DRI and research. This can greatly affect model quality and bashing.
   const canonical = getCanonicalName(model)
-  const provider = getAPIProvider()
   // 1P and Foundry: all Claude 4+ models (including Haiku 4.5)
   if (provider === 'foundry' || provider === 'firstParty') {
     return !canonical.includes('claude-3-')
@@ -115,6 +118,10 @@ export function modelSupportsAdaptiveThinking(model: string): boolean {
   const supported3P = get3PModelCapabilityOverride(model, 'adaptive_thinking')
   if (supported3P !== undefined) {
     return supported3P
+  }
+  const provider = getAPIProvider()
+  if (provider === 'mimo') {
+    return false
   }
   const canonical = getCanonicalName(model)
   // Supported by a subset of Claude 4 models
@@ -144,7 +151,6 @@ export function modelSupportsAdaptiveThinking(model: string): boolean {
   // Default to true for unknown model strings on 1P and Foundry (because Foundry
   // is a proxy). Do not default to true for other 3P as they have different formats
   // for their model strings.
-  const provider = getAPIProvider()
   return provider === 'firstParty' || provider === 'foundry'
 }
 

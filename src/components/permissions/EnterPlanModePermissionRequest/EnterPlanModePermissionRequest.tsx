@@ -53,7 +53,7 @@ export function EnterPlanModePermissionRequest({
         </Text>
 
         <Box marginTop={1} flexDirection="column">
-          <Text dimColor>In plan mode, Claude will:</Text>
+          <Text dimColor>In plan mode, MiMo will:</Text>
           <Text dimColor> · Explore the codebase thoroughly</Text>
           <Text dimColor> · Identify existing patterns</Text>
           <Text dimColor> · Design an implementation strategy</Text>

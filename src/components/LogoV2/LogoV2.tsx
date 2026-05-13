@@ -205,7 +205,7 @@ export function LogoV2(): React.ReactNode {
             </Text>
             <Text dimColor>
               {process.env.CLAUDE_CODE_TMUX_PREFIX_CONFLICTS
-                ? `Detach: ${process.env.CLAUDE_CODE_TMUX_PREFIX} ${process.env.CLAUDE_CODE_TMUX_PREFIX} d (press prefix twice - Claude uses ${process.env.CLAUDE_CODE_TMUX_PREFIX})`
+                ? `Detach: ${process.env.CLAUDE_CODE_TMUX_PREFIX} ${process.env.CLAUDE_CODE_TMUX_PREFIX} d (press prefix twice - MiMo uses ${process.env.CLAUDE_CODE_TMUX_PREFIX})`
                 : `Detach: ${process.env.CLAUDE_CODE_TMUX_PREFIX} d`}
             </Text>
           </Box>
@@ -251,8 +251,8 @@ export function LogoV2(): React.ReactNode {
   const layoutMode = getLayoutMode(columns)
 
   const userTheme = resolveThemeSetting(getGlobalConfig().theme)
-  const borderTitle = ` ${color('claude', userTheme)('Claude Code')} ${color('inactive', userTheme)(`v${version}`)} `
-  const compactBorderTitle = color('claude', userTheme)(' Claude Code ')
+  const borderTitle = ` ${color('claude', userTheme)('MiMo Code')} ${color('inactive', userTheme)(`v${version}`)} `
+  const compactBorderTitle = color('claude', userTheme)(' MiMo Code ')
 
   // Early return for compact mode
   if (layoutMode === 'compact') {
@@ -452,7 +452,7 @@ export function LogoV2(): React.ReactNode {
           </Text>
           <Text dimColor>
             {process.env.CLAUDE_CODE_TMUX_PREFIX_CONFLICTS
-              ? `Detach: ${process.env.CLAUDE_CODE_TMUX_PREFIX} ${process.env.CLAUDE_CODE_TMUX_PREFIX} d (press prefix twice - Claude uses ${process.env.CLAUDE_CODE_TMUX_PREFIX})`
+              ? `Detach: ${process.env.CLAUDE_CODE_TMUX_PREFIX} ${process.env.CLAUDE_CODE_TMUX_PREFIX} d (press prefix twice - MiMo uses ${process.env.CLAUDE_CODE_TMUX_PREFIX})`
               : `Detach: ${process.env.CLAUDE_CODE_TMUX_PREFIX} d`}
           </Text>
         </Box>

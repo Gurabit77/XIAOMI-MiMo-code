@@ -1,4 +1,12 @@
 import type { BetaToolUnion } from '@anthropic-ai/sdk/resources/beta/messages/messages.mjs'
+import type {
+  BetaRawMessageStartEvent,
+  BetaRawContentBlockStartEvent,
+  BetaRawContentBlockDeltaEvent,
+  BetaRawContentBlockStopEvent,
+  BetaRawMessageDeltaEvent,
+  BetaUsage as Usage,
+} from '@anthropic-ai/sdk/resources/beta/messages/messages.mjs'
 import type { SystemPrompt } from '../../../utils/systemPromptType.js'
 import type { Message, StreamEvent, SystemAPIErrorMessage, AssistantMessage } from '../../../types/message.js'
 import type { Tools } from '../../../Tool.js'
@@ -93,9 +101,9 @@ export async function* queryModelGrok(
 
     const adaptedStream = adaptOpenAIStreamToAnthropic(stream as AsyncIterable<ChatCompletionChunk>, grokModel)
 
-    const contentBlocks: Record<number, any> = {}
+    const contentBlocks: Record<number, Record<string, unknown>> = {}
     const collectedMessages: AssistantMessage[] = []
-    let partialMessage: any
+    let partialMessage: Record<string, unknown> | null = null
     let usage = {
       input_tokens: 0,
       output_tokens: 0,
@@ -108,16 +116,24 @@ export async function* queryModelGrok(
     for await (const event of adaptedStream) {
       switch (event.type) {
         case 'message_start': {
-          partialMessage = (event as any).message
+          const startEvent = event as BetaRawMessageStartEvent
+          partialMessage = startEvent.message as unknown as Record<string, unknown>
           ttftMs = Date.now() - start
-          if ((event as any).message?.usage) {
-            usage = { ...usage, ...((event as any).message.usage) }
+          const startUsage = startEvent.message?.usage
+          if (startUsage) {
+            usage = {
+              input_tokens: startUsage.input_tokens ?? usage.input_tokens,
+              output_tokens: startUsage.output_tokens ?? usage.output_tokens,
+              cache_creation_input_tokens: startUsage.cache_creation_input_tokens ?? usage.cache_creation_input_tokens,
+              cache_read_input_tokens: startUsage.cache_read_input_tokens ?? usage.cache_read_input_tokens,
+            }
           }
           break
         }
         case 'content_block_start': {
-          const idx = (event as any).index
-          const cb = (event as any).content_block
+          const blockStartEvent = event as BetaRawContentBlockStartEvent
+          const idx = blockStartEvent.index
+          const cb = blockStartEvent.content_block
           if (cb.type === 'tool_use') {
             contentBlocks[idx] = { ...cb, input: '' }
           } else if (cb.type === 'text') {
@@ -130,44 +146,52 @@ export async function* queryModelGrok(
           break
         }
         case 'content_block_delta': {
-          const idx = (event as any).index
-          const delta = (event as any).delta
+          const deltaEvent = event as BetaRawContentBlockDeltaEvent
+          const idx = deltaEvent.index
+          const delta = deltaEvent.delta
           const block = contentBlocks[idx]
           if (!block) break
           if (delta.type === 'text_delta') {
-            block.text = (block.text || '') + delta.text
+            block.text = ((block.text as string) || '') + delta.text
           } else if (delta.type === 'input_json_delta') {
-            block.input = (block.input || '') + delta.partial_json
+            block.input = ((block.input as string) || '') + delta.partial_json
           } else if (delta.type === 'thinking_delta') {
-            block.thinking = (block.thinking || '') + delta.thinking
+            block.thinking = ((block.thinking as string) || '') + delta.thinking
           } else if (delta.type === 'signature_delta') {
             block.signature = delta.signature
           }
           break
         }
         case 'content_block_stop': {
-          const idx = (event as any).index
+          const stopEvent = event as BetaRawContentBlockStopEvent
+          const idx = stopEvent.index
           const block = contentBlocks[idx]
           if (!block || !partialMessage) break
 
-          const m: AssistantMessage = {
+          const m = {
             message: {
               ...partialMessage,
-              content: normalizeContentFromAPI([block], tools, options.agentId),
+              content: normalizeContentFromAPI([block] as unknown as Parameters<typeof normalizeContentFromAPI>[0], tools, options.agentId),
             },
             requestId: undefined,
-            type: 'assistant',
+            type: 'assistant' as const,
             uuid: randomUUID(),
             timestamp: new Date().toISOString(),
-          }
+          } as unknown as AssistantMessage
           collectedMessages.push(m)
           yield m
           break
         }
         case 'message_delta': {
-          const deltaUsage = (event as any).usage
+          const msgDeltaEvent = event as BetaRawMessageDeltaEvent
+          const deltaUsage = msgDeltaEvent.usage
           if (deltaUsage) {
-            usage = { ...usage, ...deltaUsage }
+            usage = {
+              input_tokens: deltaUsage.input_tokens ?? usage.input_tokens,
+              output_tokens: deltaUsage.output_tokens ?? usage.output_tokens,
+              cache_creation_input_tokens: deltaUsage.cache_creation_input_tokens ?? usage.cache_creation_input_tokens,
+              cache_read_input_tokens: deltaUsage.cache_read_input_tokens ?? usage.cache_read_input_tokens,
+            }
           }
           break
         }
@@ -176,8 +200,8 @@ export async function* queryModelGrok(
       }
 
       if (event.type === 'message_stop' && usage.input_tokens + usage.output_tokens > 0) {
-        const costUSD = calculateUSDCost(grokModel, usage as any)
-        addToTotalSessionCost(costUSD, usage as any, options.model)
+        const costUSD = calculateUSDCost(grokModel, usage as unknown as Usage)
+        addToTotalSessionCost(costUSD, usage as unknown as Usage, options.model)
       }
 
       yield {

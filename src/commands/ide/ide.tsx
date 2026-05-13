@@ -119,7 +119,7 @@ function IDEScreen({
             {isSupportedJetBrainsTerminal()
               ? 'No available IDEs detected. Please install the plugin and restart your IDE:\n' +
                 'https://docs.claude.com/s/claude-code-jetbrains'
-              : 'No available IDEs detected. Make sure your IDE has the Claude Code extension or plugin installed and is running.'}
+              : 'No available IDEs detected. Make sure your IDE has the MiMo Code extension or plugin installed and is running.'}
           </Text>
         )}
 
@@ -140,7 +140,7 @@ function IDEScreen({
           ) && (
             <Box marginTop={1}>
               <Text color="warning">
-                Note: Only one Claude Code instance can be connected to VS Code
+                Note: Only one MiMo Code instance can be connected to VS Code
                 at a time.
               </Text>
             </Box>
@@ -336,7 +336,7 @@ export async function call(
     const availableIDEs = detectedIDEs.filter(ide => ide.isValid)
 
     if (availableIDEs.length === 0) {
-      onDone('No IDEs with Claude Code extension detected.')
+      onDone('No IDEs with MiMo Code extension detected.')
       return null
     }
 

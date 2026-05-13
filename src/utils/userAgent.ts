@@ -6,5 +6,7 @@
  */
 
 export function getClaudeCodeUserAgent(): string {
-  return `claude-code/${MACRO.VERSION}`
+  const product =
+    process.env.MIMO_CODE_RUNTIME === '1' ? 'mimo-code' : 'claude-code'
+  return `${product}/${MACRO.VERSION}`
 }

@@ -121,7 +121,7 @@ function ComputerUseTccPanel({
         </Box>
         <Text dimColor>
           Grant the missing permissions in System Settings, then select
-          &quot;Try again&quot;. macOS may require you to restart Claude Code
+          &quot;Try again&quot;. macOS may require you to restart MiMo Code
           after granting Screen Recording.
         </Text>
         <Select options={options} onChange={onChange} onCancel={onDone} />
@@ -180,7 +180,7 @@ function ComputerUseAppListPanel({
       {
         label: (
           <Text>
-            Deny, and tell Claude what to do differently <Text bold>(esc)</Text>
+            Deny, and tell MiMo what to do differently <Text bold>(esc)</Text>
           </Text>
         ),
         value: 'deny',
@@ -285,7 +285,7 @@ function ComputerUseAppListPanel({
         {request.willHide && request.willHide.length > 0 ? (
           <Text dimColor>
             {request.willHide.length} other{' '}
-            {plural(request.willHide.length, 'app')} will be hidden while Claude
+            {plural(request.willHide.length, 'app')} will be hidden while MiMo
             works.
           </Text>
         ) : null}

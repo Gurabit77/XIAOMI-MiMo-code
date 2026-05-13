@@ -8,13 +8,13 @@ function printUsage(): void {
   process.stdout.write(
     [
       'Usage:',
-      '  ccb weixin serve',
-      '  ccb weixin login',
-      '  ccb weixin login clear',
-      '  ccb weixin access pair <code>',
+      '  mimo weixin serve',
+      '  mimo weixin login',
+      '  mimo weixin login clear',
+      '  mimo weixin access pair <code>',
       '',
       'Session enablement:',
-      '  ccb --channels plugin:weixin@builtin',
+      '  mimo --channels plugin:weixin@builtin',
     ].join('\n') + '\n',
   )
 }
@@ -34,9 +34,9 @@ async function runLogin(clear = false): Promise<void> {
         `  User ID: ${existing.userId || 'unknown'}`,
         `  Connected since: ${existing.savedAt}`,
         '',
-        'Run `ccb weixin login clear` to disconnect.',
-        'Restart Claude Code with:',
-        '  ccb --channels plugin:weixin@builtin',
+        'Run `mimo weixin login clear` to disconnect.',
+        'Restart MiMo Code with:',
+        '  mimo --channels plugin:weixin@builtin',
       ].join('\n') + '\n',
     )
     return
@@ -71,8 +71,8 @@ async function runLogin(clear = false): Promise<void> {
       `  User ID: ${result.userId || 'unknown'}`,
       `  Base URL: ${result.baseUrl || DEFAULT_BASE_URL}`,
       '',
-      'Restart Claude Code with:',
-      '  ccb --channels plugin:weixin@builtin',
+      'Restart MiMo Code with:',
+      '  mimo --channels plugin:weixin@builtin',
     ].join('\n') + '\n',
   )
 }

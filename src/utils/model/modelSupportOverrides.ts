@@ -45,12 +45,16 @@ const OPENAI_TIERS = [
  */
 export const get3PModelCapabilityOverride = memoize(
   (model: string, capability: ModelCapabilityOverride): boolean | undefined => {
-    if (getAPIProvider() === 'firstParty') {
+    const provider = getAPIProvider()
+    if (provider === 'firstParty') {
       return undefined
+    }
+    if (provider === 'mimo') {
+      return false
     }
     const m = model.toLowerCase()
     // Choose the appropriate tier list based on provider
-    const tiers = getAPIProvider() === 'openai' ? OPENAI_TIERS : ANTHROPIC_TIERS
+    const tiers = provider === 'openai' ? OPENAI_TIERS : ANTHROPIC_TIERS
     for (const tier of tiers) {
       const pinned = process.env[tier.modelEnvVar]
       const capabilities = process.env[tier.capabilitiesEnvVar]
@@ -64,5 +68,17 @@ export const get3PModelCapabilityOverride = memoize(
     }
     return undefined
   },
-  (model, capability) => `${model.toLowerCase()}:${capability}`,
+  (model, capability) => {
+    const provider = getAPIProvider()
+    const tiers = provider === 'openai' ? OPENAI_TIERS : ANTHROPIC_TIERS
+    return [
+      provider,
+      model.toLowerCase(),
+      capability,
+      ...tiers.flatMap(tier => [
+        process.env[tier.modelEnvVar] ?? '',
+        process.env[tier.capabilitiesEnvVar] ?? '',
+      ]),
+    ].join(':')
+  },
 )

@@ -103,7 +103,7 @@ export async function daemonMain(args: string[]): Promise<void> {
 
 function printHelp(): void {
   console.log(`
-Claude Code Daemon — background process management
+MiMo Code Daemon — background process management
 
 USAGE
   claude daemon [subcommand]

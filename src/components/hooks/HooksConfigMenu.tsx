@@ -4,7 +4,7 @@
  * Users can drill into each hook event, see configured matchers and hooks
  * (of any type: command, prompt, agent, http), and view individual hook
  * details. To add or modify hooks, users should edit settings.json directly
- * or ask Claude — the menu directs them there.
+ * or ask MiMo — the menu directs them there.
  *
  * The menu is read-only because the old editing UI only supported
  * command-type hooks and duplicating the settings.json editing surface
@@ -208,7 +208,7 @@ export function HooksConfigMenu({ toolNames, onExit }: Props): React.ReactNode {
 
   // If hooks are disabled, show an informational screen.
   // The menu is read-only, so we don't offer a re-enable button —
-  // users can edit settings.json or ask Claude instead.
+  // users can edit settings.json or ask MiMo instead.
   if (hooksDisabled) {
     return (
       <Dialog
@@ -237,7 +237,7 @@ export function HooksConfigMenu({ toolNames, onExit }: Props): React.ReactNode {
           {!disabledByPolicy && (
             <Text dimColor>
               To re-enable hooks, remove &quot;disableAllHooks&quot; from
-              settings.json or ask Claude.
+              settings.json or ask MiMo.
             </Text>
           )}
         </Box>

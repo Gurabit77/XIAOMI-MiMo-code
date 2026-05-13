@@ -177,7 +177,7 @@ function getIntensity(
   return 1
 }
 
-// Claude orange color (hex #da7756)
+// MiMo blue color (hex #337AFF)
 const claudeOrange = chalk.hex('#da7756')
 
 function getHeatmapChar(intensity: number): string {

@@ -1,16 +1,18 @@
 /**
  * File-based debug logger for Remote Control bridge diagnostics.
- * Writes [RC-DEBUG] lines to ~/.claude/rc-debug.log so they survive
+ * Writes [RC-DEBUG] lines to the active config dir so they survive
  * Ink's stdout capture in the REPL / bridge UI.
  */
 import { appendFileSync, mkdirSync, existsSync } from 'node:fs'
-import { homedir } from 'node:os'
 import { join } from 'node:path'
+import { getClaudeConfigHomeDir } from '../utils/envUtils.js'
 
-const LOG_PATH = join(homedir(), '.claude', 'rc-debug.log')
+function getLogPath(): string {
+  return join(getClaudeConfigHomeDir(), 'rc-debug.log')
+}
 
 function ensureLogDir() {
-  const dir = join(homedir(), '.claude')
+  const dir = getClaudeConfigHomeDir()
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true })
 }
 
@@ -20,11 +22,14 @@ export function rcLog(msg: string): void {
   try {
     if (!headerWritten) {
       ensureLogDir()
-      appendFileSync(LOG_PATH, `\n===== RC-DEBUG session ${new Date().toISOString()} =====\n`)
+      appendFileSync(
+        getLogPath(),
+        `\n===== RC-DEBUG session ${new Date().toISOString()} =====\n`,
+      )
       headerWritten = true
     }
     const ts = new Date().toISOString().slice(11, 23) // HH:mm:ss.SSS
-    appendFileSync(LOG_PATH, `[${ts}] ${msg}\n`)
+    appendFileSync(getLogPath(), `[${ts}] ${msg}\n`)
   } catch {
     // best-effort — never crash the bridge
   }
@@ -34,6 +39,6 @@ export function rcLog(msg: string): void {
 export function rcLogClear(): void {
   try {
     ensureLogDir()
-    appendFileSync(LOG_PATH, '')
+    appendFileSync(getLogPath(), '')
   } catch {}
 }

@@ -781,7 +781,7 @@ export function ManageMarketplaces({
           selectedMarketplace.autoUpdate && (
             <Box marginTop={1}>
               <Text dimColor>
-                Auto-update enabled. Claude Code will automatically update this
+                Auto-update enabled. MiMo Code will automatically update this
                 marketplace and its installed plugins.
               </Text>
             </Box>

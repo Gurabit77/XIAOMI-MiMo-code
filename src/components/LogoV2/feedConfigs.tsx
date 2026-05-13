@@ -51,7 +51,7 @@ export function createWhatsNewFeed(releaseNotes: string[]): FeedConfig {
   const emptyMessage =
     process.env.USER_TYPE === 'ant'
       ? 'Unable to fetch latest claude-cli-internal commits'
-      : 'Check the Claude Code changelog for updates'
+      : 'Check the MiMo Code changelog for updates'
 
   return {
     title:
@@ -96,8 +96,8 @@ export function createProjectOnboardingFeed(steps: Step[]): FeedConfig {
 export function createGuestPassesFeed(): FeedConfig {
   const reward = getCachedReferrerReward()
   const subtitle = reward
-    ? `Share Claude Code and earn ${formatCreditAmount(reward)} of extra usage`
-    : 'Share Claude Code with friends'
+    ? `Share MiMo Code and earn ${formatCreditAmount(reward)} of extra usage`
+    : 'Share MiMo Code with friends'
   return {
     title: '3 guest passes',
     lines: [],

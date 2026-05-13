@@ -36,7 +36,7 @@ export function SnapshotUpdateDialog({
           label: 'Merge snapshot into current memory',
           value: 'merge',
           description:
-            'Keep current memory and ask Claude to merge in the snapshot changes.',
+            'Keep current memory and ask MiMo to merge in the snapshot changes.',
         },
         {
           label: 'Keep current memory',

@@ -71,7 +71,7 @@ export function WebFetchPermissionRequest({
     result.push({
       label: (
         <Text>
-          No, and tell Claude what to do differently <Text bold>(esc)</Text>
+          No, and tell MiMo what to do differently <Text bold>(esc)</Text>
         </Text>
       ),
       value: 'no',

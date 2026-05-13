@@ -447,7 +447,7 @@ export function oneShotJitteredNextCronRunMs(
 /**
  * A task is "missed" when its next scheduled run (computed from createdAt)
  * is in the past. Surfaced to the user at startup. Works for both one-shot
- * and recurring tasks — a recurring task whose window passed while Claude
+ * and recurring tasks — a recurring task whose window passed while MiMo
  * was down is still "missed".
  */
 export function findMissedTasks(tasks: CronTask[], nowMs: number): CronTask[] {

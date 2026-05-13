@@ -4,7 +4,7 @@ import { logForDebugging } from 'src/utils/debug.js'
 
 const SSH_TIMEOUT_MS = 60_000
 const REMOTE_BIN_DIR = '~/.local/bin'
-const REMOTE_CLI_FILE = 'claude-code-cli.js'
+const REMOTE_CLI_FILE = 'mimo-code-cli.js'
 const REMOTE_WRAPPER = 'claude'
 
 export interface DeployOptions {

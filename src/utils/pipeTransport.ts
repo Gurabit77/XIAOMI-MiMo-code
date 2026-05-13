@@ -144,7 +144,7 @@ export function getPipesDir(): string {
 export function getPipePath(name: string): string {
   const safeName = name.replace(/[^a-zA-Z0-9_-]/g, '_')
   if (process.platform === 'win32') {
-    return `\\\\.\\pipe\\claude-code-${safeName}`
+    return `\\\\.\\pipe\\mimo-code-${safeName}`
   }
   return join(getPipesDir(), `${safeName}.sock`)
 }
@@ -718,6 +718,6 @@ export function getLocalIp(): string {
  * This avoids crashes when the state hasn't been extended by the PIPE_IPC bootstrap.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function getPipeIpc(state: any): PipeIpcState {
-  return state?.pipeIpc ?? DEFAULT_PIPE_IPC
+export function getPipeIpc(state: Record<string, unknown>): PipeIpcState {
+  return (state?.pipeIpc as PipeIpcState | undefined) ?? DEFAULT_PIPE_IPC
 }

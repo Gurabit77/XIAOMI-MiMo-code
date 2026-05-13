@@ -30,10 +30,10 @@ import { getInitialSettings } from '../settings/settings.js'
 import { which } from '../which.js'
 import { getUserBinDir, getXDGDataHome } from '../xdg.js'
 
-export const MACOS_BUNDLE_ID = 'com.anthropic.claude-code-url-handler'
-const APP_NAME = 'Claude Code URL Handler'
-const DESKTOP_FILE_NAME = 'claude-code-url-handler.desktop'
-const MACOS_APP_NAME = 'Claude Code URL Handler.app'
+export const MACOS_BUNDLE_ID = 'com.anthropic.mimo-code-url-handler'
+const APP_NAME = 'MiMo Code URL Handler'
+const DESKTOP_FILE_NAME = 'mimo-code-url-handler.desktop'
+const MACOS_APP_NAME = 'MiMo Code URL Handler.app'
 
 // Shared between register* (writes these paths/values) and
 // isProtocolHandlerCurrent (reads them back). Keep the writer and reader
@@ -108,7 +108,7 @@ async function registerMacos(claudePath: string): Promise<void> {
   <array>
     <dict>
       <key>CFBundleURLName</key>
-      <string>Claude Code Deep Link</string>
+      <string>MiMo Code Deep Link</string>
       <key>CFBundleURLSchemes</key>
       <array>
         <string>${DEEP_LINK_PROTOCOL}</string>
@@ -146,7 +146,7 @@ async function registerLinux(claudePath: string): Promise<void> {
 
   const desktopEntry = `[Desktop Entry]
 Name=${APP_NAME}
-Comment=Handle ${DEEP_LINK_PROTOCOL}:// deep links for Claude Code
+Comment=Handle ${DEEP_LINK_PROTOCOL}:// deep links for MiMo Code
 ${linuxExecLine(claudePath)}
 Type=Application
 NoDisplay=true

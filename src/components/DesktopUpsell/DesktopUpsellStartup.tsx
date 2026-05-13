@@ -83,17 +83,17 @@ export function DesktopUpsellStartup({ onDone }: Props): React.ReactNode {
   }
 
   const options = [
-    { label: 'Open in Claude Code Desktop', value: 'try' as const },
+    { label: 'Open in MiMo Code Desktop', value: 'try' as const },
     { label: 'Not now', value: 'not-now' as const },
     { label: "Don't ask again", value: 'never' as const },
   ]
 
   return (
-    <PermissionDialog title="Try Claude Code Desktop">
+    <PermissionDialog title="Try MiMo Code Desktop">
       <Box flexDirection="column" paddingX={2} paddingY={1}>
         <Box marginBottom={1}>
           <Text>
-            Same Claude Code with visual diffs, live app preview, parallel
+            Same MiMo Code with visual diffs, live app preview, parallel
             sessions, and more.
           </Text>
         </Box>

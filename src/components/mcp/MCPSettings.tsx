@@ -171,7 +171,7 @@ export function MCPSettings({ onComplete }: Props): React.ReactNode {
       const defaultTab =
         viewState.server.transport === 'claudeai-proxy'
           ? 'claude.ai'
-          : 'Claude Code'
+          : 'MiMo Code'
 
       if (viewState.server.transport === 'stdio') {
         return (

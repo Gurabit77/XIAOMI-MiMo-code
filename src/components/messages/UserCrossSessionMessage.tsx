@@ -1,5 +1,5 @@
 /**
- * UserCrossSessionMessage — render a message received from another Claude session
+ * UserCrossSessionMessage — render a message received from another MiMo session
  * via UDS_INBOX (SendMessage tool).
  */
 import type { TextBlockParam } from '@anthropic-ai/sdk/resources/index.mjs';

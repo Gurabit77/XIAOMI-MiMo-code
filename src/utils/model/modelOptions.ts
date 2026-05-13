@@ -1,5 +1,6 @@
 // biome-ignore-all assist/source/organizeImports: ANT-ONLY import markers must not be reordered
 import { getInitialMainLoopModel } from '../../bootstrap/state.js'
+import { isMiMoRuntime } from '../mimoRuntimeConfig.js'
 import {
   isClaudeAISubscriber,
   isMaxSubscriber,
@@ -348,6 +349,38 @@ function getOpusPlanOption(): ModelOption {
 // @[MODEL LAUNCH]: Update the model picker lists below to include/reorder options for the new model.
 // Each user tier (ant, Max/Team Premium, Pro/Team Standard/Enterprise, PAYG 1P, PAYG 3P) has its own list.
 function getModelOptionsBase(fastMode = false): ModelOption[] {
+  // MiMo Code: only show MiMo models
+  if (isMiMoRuntime()) {
+    return [
+      {
+        value: null,
+        label: 'Default (recommended)',
+        description: 'MiMo V2.5 · Fast & efficient coding',
+      },
+      {
+        value: 'mimo-v2.5',
+        label: 'MiMo V2.5',
+        description: 'MiMo V2.5 · 256K context · Best for everyday coding',
+      },
+      {
+        value: 'mimo-v2.5-pro',
+        label: 'MiMo V2.5 Pro',
+        description:
+          'MiMo V2.5 Pro · 1M context · Most capable for complex reasoning',
+      },
+      {
+        value: 'mimo-v2-pro',
+        label: 'MiMo V2 Pro',
+        description: 'MiMo V2 Pro · 1M context · Previous generation flagship',
+      },
+      {
+        value: 'mimo-v2-omni',
+        label: 'MiMo V2 Omni',
+        description: 'MiMo V2 Omni · Multimodal: image, video, audio',
+      },
+    ]
+  }
+
   if (process.env.USER_TYPE === 'ant') {
     // Build options from antModels config
     const antModelOptions: ModelOption[] = getAntModels().map(m => ({
@@ -535,15 +568,37 @@ function getKnownModelOption(model: string): ModelOption | null {
   }
 }
 
+function hasModelOption(options: ModelOption[], value: string): boolean {
+  const normalized = value.toLowerCase()
+  return options.some(existing =>
+    typeof existing.value === 'string'
+      ? existing.value.toLowerCase() === normalized
+      : false,
+  )
+}
+
 export function getModelOptions(fastMode = false): ModelOption[] {
   const options = getModelOptionsBase(fastMode)
 
+  // MiMo Code: only return MiMo models, skip all Claude model appending logic
+  if (isMiMoRuntime()) {
+    // Only add the custom MiMo model from env if set
+    const envCustomModel = process.env.ANTHROPIC_CUSTOM_MODEL_OPTION
+    if (envCustomModel && !hasModelOption(options, envCustomModel)) {
+      options.push({
+        value: envCustomModel,
+        label: process.env.ANTHROPIC_CUSTOM_MODEL_OPTION_NAME ?? envCustomModel,
+        description:
+          process.env.ANTHROPIC_CUSTOM_MODEL_OPTION_DESCRIPTION ??
+          `Custom model (${envCustomModel})`,
+      })
+    }
+    return options
+  }
+
   // Add the custom model from the ANTHROPIC_CUSTOM_MODEL_OPTION env var
   const envCustomModel = process.env.ANTHROPIC_CUSTOM_MODEL_OPTION
-  if (
-    envCustomModel &&
-    !options.some(existing => existing.value === envCustomModel)
-  ) {
+  if (envCustomModel && !hasModelOption(options, envCustomModel)) {
     options.push({
       value: envCustomModel,
       label: process.env.ANTHROPIC_CUSTOM_MODEL_OPTION_NAME ?? envCustomModel,

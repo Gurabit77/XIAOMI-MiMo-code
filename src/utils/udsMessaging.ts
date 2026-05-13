@@ -1,5 +1,5 @@
 /**
- * UDS Messaging Layer — Unix Domain Socket IPC for Claude Code instances.
+ * UDS Messaging Layer — Unix Domain Socket IPC for MiMo Code instances.
  *
  * Each session auto-creates a UDS server so peer sessions can send messages.
  * Protocol: newline-delimited JSON (NDJSON), one message per line.
@@ -101,12 +101,12 @@ export function getDefaultUdsSocketPath(): string {
   if (defaultSocketPath) return defaultSocketPath
   const nonce = randomBytes(16).toString('hex')
   if (process.platform === 'win32') {
-    defaultSocketPath = `\\\\.\\pipe\\claude-code-${process.pid}-${nonce}`
+    defaultSocketPath = `\\\\.\\pipe\\mimo-code-${process.pid}-${nonce}`
     return defaultSocketPath
   }
   defaultSocketPath = join(
     tmpdir(),
-    'claude-code-socks',
+    'mimo-code-socks',
     `${process.pid}-${nonce}`,
     'messaging.sock',
   )

@@ -30,7 +30,7 @@ const DEFAULT_DIALOG = {
   timeEstimate: 'a few minutes',
   dialogBody: 'Interactive planning on the web where you can edit and leave targeted comments on Claude\'s plan.',
   dialogPipeline: 'Plan → Edit → Execute',
-  usageBlurb: ['Remote plan mode with rich web editing experience.', 'Runs in Claude Code on the web. When the plan is ready,', 'you can execute it in the web session or send it back here.', 'You can continue to work while the plan is generated remotely.'],
+  usageBlurb: ['Remote plan mode with rich web editing experience.', 'Runs in MiMo Code on the web. When the plan is ready,', 'you can execute it in the web session or send it back here.', 'You can continue to work while the plan is generated remotely.'],
 }
 
 export const DIALOG_CONFIG = {
@@ -40,7 +40,7 @@ export const DIALOG_CONFIG = {
     timeEstimate: '~10–30 min',
     dialogBody: 'Interactive planning on the web where you can edit and leave targeted comments on Claude\'s plan.',
     dialogPipeline: 'Scope → Critique → Edit → Execute',
-    usageBlurb: ['Advanced multi-agent plan mode.', 'Runs in Claude Code on the web. When the plan is ready,', 'you can execute it in the web session or send it back here.', 'You can continue to work while the plan is generated remotely.'],
+    usageBlurb: ['Advanced multi-agent plan mode.', 'Runs in MiMo Code on the web. When the plan is ready,', 'you can execute it in the web session or send it back here.', 'You can continue to work while the plan is generated remotely.'],
   },
 }
 

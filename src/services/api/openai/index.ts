@@ -13,6 +13,13 @@ import type { Stream } from 'openai/streaming.mjs'
 import type {
   ChatCompletionCreateParamsStreaming,
 } from 'openai/resources/chat/completions/completions.mjs'
+import type {
+  BetaRawMessageStartEvent,
+  BetaRawContentBlockStartEvent,
+  BetaRawContentBlockDeltaEvent,
+  BetaRawMessageDeltaEvent,
+  BetaUsage as Usage,
+} from '@anthropic-ai/sdk/resources/beta/messages/messages.mjs'
 import { getOpenAIClient } from './client.js'
 import { anthropicMessagesToOpenAI, resolveOpenAIModel, adaptOpenAIStreamToAnthropic, anthropicToolsToOpenAI, anthropicToolChoiceToOpenAI } from '@ant/model-provider'
 import { normalizeMessagesForAPI } from '../../../utils/messages.js'
@@ -91,8 +98,8 @@ function isOpenAIConvertibleMessage(msg: Message): msg is AssistantMessage | Use
  * `message_stop` handler and the post-loop safety fallback.
  */
 function assembleFinalAssistantOutputs(params: {
-  partialMessage: any
-  contentBlocks: Record<number, any>
+  partialMessage: Record<string, unknown> | null
+  contentBlocks: Record<number, Record<string, unknown>>
   tools: Tools
   agentId: string | undefined
   usage: { input_tokens: number; output_tokens: number; cache_creation_input_tokens: number; cache_read_input_tokens: number }
@@ -104,14 +111,14 @@ function assembleFinalAssistantOutputs(params: {
 
   const allBlocks = Object.keys(contentBlocks)
     .sort((a, b) => Number(a) - Number(b))
-    .map(k => contentBlocks[Number(k)])
+    .map(k => contentBlocks[Number(k)]!)
     .filter(Boolean)
 
   if (allBlocks.length > 0) {
     outputs.push({
       message: {
         ...partialMessage,
-        content: normalizeContentFromAPI(allBlocks, tools, agentId as AgentId | undefined),
+        content: normalizeContentFromAPI(allBlocks as unknown as Parameters<typeof normalizeContentFromAPI>[0], tools, agentId as AgentId | undefined),
         usage,
         stop_reason: stopReason,
         stop_sequence: null,
@@ -297,9 +304,9 @@ export async function* queryModelOpenAI(
     const adaptedStream = adaptOpenAIStreamToAnthropic(stream, openaiModel)
 
     // Accumulate content blocks and usage, same as the Anthropic path in claude.ts
-    const contentBlocks: Record<number, any> = {}
+    const contentBlocks: Record<number, Record<string, unknown>> = {}
     const collectedMessages: AssistantMessage[] = []
-    let partialMessage: any
+    let partialMessage: Record<string, unknown> | null = null
     let stopReason: string | null = null
     let usage = {
       input_tokens: 0,
@@ -313,19 +320,24 @@ export async function* queryModelOpenAI(
     for await (const event of adaptedStream) {
       switch (event.type) {
         case 'message_start': {
-          partialMessage = (event as any).message
+          const startEvent = event as BetaRawMessageStartEvent
+          partialMessage = startEvent.message as unknown as Record<string, unknown>
           ttftMs = Date.now() - start
-          if ((event as any).message?.usage) {
+          const startUsage = startEvent.message?.usage
+          if (startUsage) {
             usage = {
-              ...usage,
-              ...(event as any).message.usage,
+              input_tokens: startUsage.input_tokens ?? usage.input_tokens,
+              output_tokens: startUsage.output_tokens ?? usage.output_tokens,
+              cache_creation_input_tokens: startUsage.cache_creation_input_tokens ?? usage.cache_creation_input_tokens,
+              cache_read_input_tokens: startUsage.cache_read_input_tokens ?? usage.cache_read_input_tokens,
             }
           }
           break
         }
         case 'content_block_start': {
-          const idx = (event as any).index
-          const cb = (event as any).content_block
+          const blockStartEvent = event as BetaRawContentBlockStartEvent
+          const idx = blockStartEvent.index
+          const cb = blockStartEvent.content_block
           if (cb.type === 'tool_use') {
             contentBlocks[idx] = { ...cb, input: '' }
           } else if (cb.type === 'text') {
@@ -338,16 +350,17 @@ export async function* queryModelOpenAI(
           break
         }
         case 'content_block_delta': {
-          const idx = (event as any).index
-          const delta = (event as any).delta
+          const deltaEvent = event as BetaRawContentBlockDeltaEvent
+          const idx = deltaEvent.index
+          const delta = deltaEvent.delta
           const block = contentBlocks[idx]
           if (!block) break
           if (delta.type === 'text_delta') {
-            block.text = (block.text || '') + delta.text
+            block.text = ((block.text as string) || '') + delta.text
           } else if (delta.type === 'input_json_delta') {
-            block.input = (block.input || '') + delta.partial_json
+            block.input = ((block.input as string) || '') + delta.partial_json
           } else if (delta.type === 'thinking_delta') {
-            block.thinking = (block.thinking || '') + delta.thinking
+            block.thinking = ((block.thinking as string) || '') + delta.thinking
           } else if (delta.type === 'signature_delta') {
             block.signature = delta.signature
           }
@@ -358,12 +371,18 @@ export async function* queryModelOpenAI(
           break
         }
         case 'message_delta': {
-          const deltaUsage = (event as any).usage
+          const msgDeltaEvent = event as BetaRawMessageDeltaEvent
+          const deltaUsage = msgDeltaEvent.usage
           if (deltaUsage) {
-            usage = { ...usage, ...deltaUsage }
+            usage = {
+              input_tokens: deltaUsage.input_tokens ?? usage.input_tokens,
+              output_tokens: deltaUsage.output_tokens ?? usage.output_tokens,
+              cache_creation_input_tokens: deltaUsage.cache_creation_input_tokens ?? usage.cache_creation_input_tokens,
+              cache_read_input_tokens: deltaUsage.cache_read_input_tokens ?? usage.cache_read_input_tokens,
+            }
           }
-          if ((event as any).delta?.stop_reason != null) {
-            stopReason = (event as any).delta.stop_reason
+          if (msgDeltaEvent.delta?.stop_reason != null) {
+            stopReason = msgDeltaEvent.delta.stop_reason
           }
           break
         }
@@ -387,8 +406,8 @@ export async function* queryModelOpenAI(
           }
           // Track cost and token usage
           if (usage.input_tokens + usage.output_tokens > 0) {
-            const costUSD = calculateUSDCost(openaiModel, usage as any)
-            addToTotalSessionCost(costUSD, usage as any, options.model)
+            const costUSD = calculateUSDCost(openaiModel, usage as unknown as Usage)
+            addToTotalSessionCost(costUSD, usage as unknown as Usage, options.model)
           }
           break
         }

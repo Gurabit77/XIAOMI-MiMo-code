@@ -147,7 +147,7 @@ function ClaudeInChromeMenu({
       <Box flexDirection="column" gap={1}>
         <Text>
           Claude in Chrome works with the Chrome extension to let you control
-          your browser directly from Claude Code. Navigate websites, fill forms,
+          your browser directly from MiMo Code. Navigate websites, fill forms,
           capture screenshots, record GIFs, and debug with console logs and
           network requests.
         </Text>
@@ -210,7 +210,7 @@ function ClaudeInChromeMenu({
             <Text dimColor>
               Site-level permissions are inherited from the Chrome extension.
               Manage permissions in the Chrome extension settings to control
-              which sites Claude can browse, click, and type on.
+              which sites MiMo can browse, click, and type on.
             </Text>
           </>
         )}

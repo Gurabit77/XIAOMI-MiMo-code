@@ -20,9 +20,10 @@ export interface AccountData {
 }
 
 export function getStateDir(): string {
+  const configHomeDir =
+    process.env.CLAUDE_CONFIG_DIR || join(homedir(), '.mimo')
   const dir =
-    process.env.WEIXIN_STATE_DIR ||
-    join(homedir(), '.claude', 'channels', 'weixin')
+    process.env.WEIXIN_STATE_DIR || join(configHomeDir, 'channels', 'weixin')
   if (!existsSync(dir)) {
     mkdirSync(dir, { recursive: true })
   }

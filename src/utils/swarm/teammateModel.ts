@@ -6,5 +6,9 @@ import { getAPIProvider } from '../model/providers.js'
 // use Opus 4.6. Must be provider-aware so Bedrock/Vertex/Foundry customers get
 // the correct model ID.
 export function getHardcodedTeammateModelFallback(): string {
-  return CLAUDE_OPUS_4_6_CONFIG[getAPIProvider()]
+  const provider = getAPIProvider()
+  if (provider === 'mimo') {
+    return 'mimo-v2.5-pro'
+  }
+  return CLAUDE_OPUS_4_6_CONFIG[provider]
 }

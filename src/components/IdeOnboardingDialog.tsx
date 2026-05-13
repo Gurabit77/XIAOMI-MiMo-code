@@ -47,7 +47,7 @@ export function IdeOnboardingDialog({
         title={
           <>
             <Text color="claude">✻ </Text>
-            <Text>Welcome to Claude Code for {ideName}</Text>
+            <Text>Welcome to MiMo Code for {ideName}</Text>
           </>
         }
         subtitle={
@@ -65,7 +65,7 @@ export function IdeOnboardingDialog({
             and <Text color="suggestion">⧉ selected lines</Text>
           </Text>
           <Text>
-            • Review Claude Code&apos;s changes{' '}
+            • Review MiMo Code&apos;s changes{' '}
             <Text color="diffAddedWord">+11</Text>{' '}
             <Text color="diffRemovedWord">-22</Text> in the comfort of your IDE
           </Text>

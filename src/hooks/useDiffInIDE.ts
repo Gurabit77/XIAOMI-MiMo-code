@@ -60,7 +60,7 @@ export function useDiffInIDE({
 
   const sha = useMemo(() => randomUUID().slice(0, 6), [])
   const tabName = useMemo(
-    () => `✻ [Claude Code] ${basename(filePath)} (${sha}) ⧉`,
+    () => `✻ [MiMo Code] ${basename(filePath)} (${sha}) ⧉`,
     [filePath, sha],
   )
 
@@ -206,12 +206,9 @@ export function computeEditsFromContents(
  * 2. Tab is saved in IDE (we then close the tab)
  * 3. User selected an option in IDE
  * 4. User selected an option in terminal (or hit esc)
+ * 5. Timeout after 5 minutes of inactivity (auto-reject)
  *
  * Resolves with the new file content.
- *
- * TODO: Time out after 5 mins of inactivity?
- * TODO: Update auto-approval UI when IDE exits
- * TODO: Close the IDE tab when the approval prompt is unmounted
  */
 async function showDiffInIDE(
   file_path: string,
@@ -281,16 +278,26 @@ async function showDiffInIDE(
       ideOldPath = converter.toIDEPath(oldFilePath)
     }
 
-    const rpcResult = await callIdeRpc(
-      'openDiff',
-      {
-        old_file_path: ideOldPath,
-        new_file_path: ideOldPath,
-        new_file_contents: updatedFile,
-        tab_name: tabName,
-      },
-      ideClient,
-    )
+    const IDE_DIFF_TIMEOUT_MS = 5 * 60 * 1000 // 5 minutes
+
+    const rpcResult = await Promise.race([
+      callIdeRpc(
+        'openDiff',
+        {
+          old_file_path: ideOldPath,
+          new_file_path: ideOldPath,
+          new_file_contents: updatedFile,
+          tab_name: tabName,
+        },
+        ideClient,
+      ),
+      new Promise<never>((_, reject) =>
+        setTimeout(
+          () => reject(new Error('IDE diff approval timed out after 5 minutes')),
+          IDE_DIFF_TIMEOUT_MS,
+        ).unref(),
+      ),
+    ])
 
     // Convert the raw RPC result to a ToolCallResponse format
     const data = Array.isArray(rpcResult) ? rpcResult : [rpcResult]

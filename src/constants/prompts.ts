@@ -2,6 +2,7 @@
 import { type as osType, version as osVersion, release as osRelease } from 'os'
 import { env } from '../utils/env.js'
 import { getIsGit } from '../utils/git.js'
+import { isMiMoRuntime } from '../utils/mimoRuntimeConfig.js'
 import { getCwd } from '../utils/cwd.js'
 import { getIsNonInteractiveSession } from '../bootstrap/state.js'
 import { getCurrentWorktreeSession } from '../utils/worktree.js'
@@ -117,7 +118,7 @@ export const SYSTEM_PROMPT_DYNAMIC_BOUNDARY =
   '__SYSTEM_PROMPT_DYNAMIC_BOUNDARY__'
 
 // @[MODEL LAUNCH]: Update the latest frontier model.
-const FRONTIER_MODEL_NAME = 'Claude Opus 4.7'
+const FRONTIER_MODEL_NAME = 'MiMo V2.5 Pro'
 
 // @[MODEL LAUNCH]: Update the model family IDs below to the latest in each tier.
 const CLAUDE_LATEST_MODEL_IDS = {
@@ -213,7 +214,7 @@ function getSimpleDoingTasksSection(): string {
   ]
 
   const userHelpSubitems = [
-    `/help: Get help with using Claude Code`,
+    `/help: Get help with using MiMo Code`,
     `To give feedback, users should ${MACRO.ISSUES_EXPLAINER}`,
   ]
 
@@ -235,7 +236,7 @@ function getSimpleDoingTasksSection(): string {
     `Take accountability for mistakes without collapsing into over-apology, self-abasement, or surrender. If the user pushes back repeatedly or becomes harsh, stay steady and honest rather than becoming increasingly agreeable to appease them. Acknowledge what went wrong, stay focused on solving the problem, and maintain self-respect — don't abandon a correct position just because the user is frustrated.`,
     `Don't proactively mention your knowledge cutoff date or a lack of real-time data unless the user's message makes it directly relevant. Cutoff information is already in the environment section — you don't need to repeat it in responses.`,
     // TODO: Customize for our fork — replace /share + Slack channel with our own feedback channel
-    `If the user reports a bug, slowness, or unexpected behavior with Claude Code itself (as opposed to asking you to fix their own code), recommend the appropriate slash command: /issue for model-related problems (odd outputs, wrong tool choices, hallucinations, refusals), or /share to upload the full session transcript for product bugs, crashes, slowness, or general issues. Only recommend these when the user is describing a problem with Claude Code. After /share produces a ccshare link, if you have a Slack MCP tool available, offer to post the link to #claude-code-feedback (channel ID C07VBSHV7EV) for the user.`,
+    `If the user reports a bug, slowness, or unexpected behavior with MiMo Code itself (as opposed to asking you to fix their own code), recommend the appropriate slash command: /issue for model-related problems (odd outputs, wrong tool choices, hallucinations, refusals), or /share to upload the full session transcript for product bugs, crashes, slowness, or general issues. Only recommend these when the user is describing a problem with MiMo Code. After /share produces a ccshare link, if you have a Slack MCP tool available, offer to post the link to #claude-code-feedback (channel ID C07VBSHV7EV) for the user.`,
     `If the user asks for help or wants to give feedback inform them of the following:`,
     userHelpSubitems,
   ]
@@ -539,7 +540,7 @@ export async function getSystemPrompt(
 ): Promise<string[]> {
   if (isEnvTruthy(process.env.CLAUDE_CODE_SIMPLE)) {
     return [
-      `You are Claude Code, Anthropic's official CLI for Claude.\n\nCWD: ${getCwd()}\nDate: ${getSessionStartDate()}`,
+      `You are MiMo Code, Xiaomi's AI coding assistant CLI powered by MiMo.\n我是小米的通用智能基座 MiMo，当前您正在使用的模型是 ${model}。我们的宗旨是：让先进的 AI 技术服务大众，助力人机共创的未来。这里汇聚顶尖的工程师与研究者，以严谨的工程、开放的探索，推动语言、多模态、语音等领域的突破。\n\nCWD: ${getCwd()}\nDate: ${getSessionStartDate()}`,
     ]
   }
 
@@ -639,6 +640,10 @@ ${CYBER_RISK_INSTRUCTION}`,
   return [
     // --- Static content (cacheable) ---
     getSimpleIntroSection(outputStyleConfig),
+    // MiMo Code identity
+    isMiMoRuntime()
+      ? `我是小米的通用智能基座 MiMo，当前您正在使用的模型是 ${model}。我们的宗旨是：让先进的 AI 技术服务大众，助力人机共创的未来。这里汇聚顶尖的工程师与研究者，以严谨的工程、开放的探索，推动语言、多模态、语音等领域的突破。`
+      : null,
     getSimpleSystemSection(),
     outputStyleConfig === null ||
     outputStyleConfig.keepCodingInstructions === true
@@ -775,10 +780,10 @@ export async function computeSimpleEnvInfo(
       : `The most recent Claude model family is Claude 4.5/4.6/4.7. Model IDs — Opus 4.7: '${CLAUDE_LATEST_MODEL_IDS.opus}', Sonnet 4.6: '${CLAUDE_LATEST_MODEL_IDS.sonnet}', Haiku 4.5: '${CLAUDE_LATEST_MODEL_IDS.haiku}'. When building AI applications, default to the latest and most capable Claude models.`,
     process.env.USER_TYPE === 'ant' && isUndercover()
       ? null
-      : `Claude Code is available as a CLI in the terminal, desktop app (Mac/Windows), web app (claude.ai/code), and IDE extensions (VS Code, JetBrains). Claude is also accessible via Claude in Chrome (a browsing agent), Claude in Excel (a spreadsheet agent), and Cowork (desktop automation for non-developers).`,
+      : `MiMo Code is available as a CLI in the terminal, desktop app (Mac/Windows), web app (claude.ai/code), and IDE extensions (VS Code, JetBrains). MiMo is also accessible via Claude in Chrome (a browsing agent), Claude in Excel (a spreadsheet agent), and Cowork (desktop automation for non-developers).`,
     process.env.USER_TYPE === 'ant' && isUndercover()
       ? null
-      : `Fast mode for Claude Code uses the same ${FRONTIER_MODEL_NAME} model with faster output. It does NOT switch to a different model. It can be toggled with /fast.`,
+      : `Fast mode for MiMo Code uses the same ${FRONTIER_MODEL_NAME} model with faster output. It does NOT switch to a different model. It can be toggled with /fast.`,
   ].filter(item => item !== null)
 
   return [
@@ -836,7 +841,7 @@ export function getUnameSR(): string {
   return `${osType()} ${osRelease()}`
 }
 
-export const DEFAULT_AGENT_PROMPT = `You are an agent for Claude Code, Anthropic's official CLI for Claude. Given the user's message, you should use the tools available to complete the task. Complete the task fully—don't gold-plate, but don't leave it half-done. When you complete the task, respond with a concise report covering what was done and any key findings — the caller will relay this to the user, so it only needs the essentials.`
+export const DEFAULT_AGENT_PROMPT = `You are an agent for MiMo Code, Xiaomi's AI coding assistant CLI powered by MiMo. Given the user's message, you should use the tools available to complete the task. Complete the task fully—don't gold-plate, but don't leave it half-done. When you complete the task, respond with a concise report covering what was done and any key findings — the caller will relay this to the user, so it only needs the essentials.`
 
 export async function enhanceSystemPromptWithEnvDetails(
   existingSystemPrompt: string[],

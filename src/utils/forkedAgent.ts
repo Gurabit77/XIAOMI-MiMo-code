@@ -560,12 +560,14 @@ export async function runForkedAgent({
     })) {
       // Extract real usage from message_delta stream events (final usage per API call)
       if (message.type === 'stream_event') {
+        const streamMsg = message as Record<string, unknown>
+        const evt = streamMsg.event as Record<string, unknown> | undefined
         if (
-          'event' in message &&
-          (message as any).event?.type === 'message_delta' &&
-          (message as any).event.usage
+          evt &&
+          evt.type === 'message_delta' &&
+          evt.usage
         ) {
-          const turnUsage = updateUsage({ ...EMPTY_USAGE }, (message as any).event.usage)
+          const turnUsage = updateUsage({ ...EMPTY_USAGE }, evt.usage as Parameters<typeof updateUsage>[1])
           totalUsage = accumulateUsage(totalUsage, turnUsage)
         }
         continue

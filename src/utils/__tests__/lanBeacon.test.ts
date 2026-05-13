@@ -1,4 +1,8 @@
 import { describe, test, expect, mock, beforeEach, afterEach } from 'bun:test'
+import { createHmac } from 'crypto'
+
+// Fixed HMAC key for tests
+const TEST_LAN_KEY = 'a'.repeat(64)
 
 // Mock dgram before importing LanBeacon
 const mockSocket = {
@@ -17,7 +21,21 @@ mock.module('dgram', () => ({
   createSocket: () => mockSocket,
 }))
 
-const { LanBeacon } = await import('../lanBeacon.js')
+const { LanBeacon, _setLanKeyForTesting } = await import('../lanBeacon.js')
+
+// Set the HMAC key to our test value so signPayload/verifyPayload use it
+_setLanKeyForTesting(TEST_LAN_KEY)
+
+/** Sign a JSON payload with the test HMAC key (mirrors lanBeacon's signPayload). */
+function signTestPayload(json: string): string {
+  return createHmac('sha256', TEST_LAN_KEY).update(json).digest('hex')
+}
+
+/** Build a Buffer containing a signed announce packet. */
+function buildSignedAnnounce(fields: Record<string, unknown>): Buffer {
+  const json = JSON.stringify(fields)
+  return Buffer.from(JSON.stringify({ ...fields, hmac: signTestPayload(json) }))
+}
 
 type MockCall = [string, ...unknown[]]
 
@@ -82,7 +100,7 @@ describe('LanBeacon', () => {
     const messageHandler = getMessageHandler()
     if (!messageHandler) return
 
-    const peerAnnounce = JSON.stringify({
+    const peerFields = {
       proto: 'claude-pipe-v1',
       pipeName: 'cli-peer5678',
       machineId: 'machine-xyz',
@@ -91,14 +109,14 @@ describe('LanBeacon', () => {
       tcpPort: 7102,
       role: 'sub',
       ts: Date.now(),
-    })
+    }
 
     let discoveredPeer: any = null
     beacon.on('peer-discovered', (peer: any) => {
       discoveredPeer = peer
     })
 
-    messageHandler(Buffer.from(peerAnnounce), {
+    messageHandler(buildSignedAnnounce(peerFields), {
       address: '192.168.1.20',
       port: 7101,
     })
@@ -115,7 +133,7 @@ describe('LanBeacon', () => {
     const messageHandler = getMessageHandler()
     if (!messageHandler) return
 
-    const selfAnnounce = JSON.stringify({
+    const selfFields = {
       proto: 'claude-pipe-v1',
       pipeName: 'cli-test1234', // same as our pipeName
       machineId: 'machine-abc',
@@ -124,9 +142,9 @@ describe('LanBeacon', () => {
       tcpPort: 7100,
       role: 'main',
       ts: Date.now(),
-    })
+    }
 
-    messageHandler(Buffer.from(selfAnnounce), {
+    messageHandler(buildSignedAnnounce(selfFields), {
       address: '192.168.1.10',
       port: 7101,
     })

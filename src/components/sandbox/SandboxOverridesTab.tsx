@@ -115,7 +115,7 @@ function OverridesSelect({
           <Text bold dimColor>
             Allow unsandboxed fallback:
           </Text>{' '}
-          When a command fails due to sandbox restrictions, Claude can retry
+          When a command fails due to sandbox restrictions, MiMo can retry
           with dangerouslyDisableSandbox to run outside the sandbox (falling
           back to default permissions).
         </Text>

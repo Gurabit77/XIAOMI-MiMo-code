@@ -28,7 +28,7 @@ const FRICTION_PATTERNS = [
   // "No," or "No!" at start — comma/exclamation implies correction tone
   // (avoids "No problem", "No thanks", "No I think we should...")
   /^no[,!]\s/i,
-  // Direct corrections about Claude's output
+  // Direct corrections about MiMo's output
   /\bthat'?s (wrong|incorrect|not (what|right|correct))\b/i,
   /\bnot what I (asked|wanted|meant|said)\b/i,
   // Referencing prior instructions Claude missed

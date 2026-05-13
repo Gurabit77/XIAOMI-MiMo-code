@@ -16,7 +16,7 @@ import { execFileNoThrowWithCwd } from '../utils/execFileNoThrow.js'
 import { gracefulShutdown } from '../utils/gracefulShutdown.js'
 import { writeToStdout } from '../utils/process.js'
 
-const PACKAGE_NAME = 'claude-code-best'
+const PACKAGE_NAME = 'mimo-code'
 
 function getCurrentVersion(): string {
   // Read version from the nearest package.json (walks up from this file)

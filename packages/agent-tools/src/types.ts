@@ -99,7 +99,7 @@ export type PermissionResult =
  * This defines the protocol-level contract for any tool — independent of
  * React rendering, specific context types, or host infrastructure.
  *
- * The host (Claude Code) extends this with render methods, richer context
+ * The host (MiMo Code) extends this with render methods, richer context
  * types, and other host-specific features. Host tools structurally satisfy
  * this interface because they implement all required fields.
  *

@@ -3,7 +3,7 @@ import { join } from 'path'
 import { getFsImplementation } from './fsOperations.js'
 import { djb2Hash } from './hash.js'
 
-const paths = envPaths('claude-cli')
+const paths = envPaths('mimo-code')
 
 // Local sanitizePath using djb2Hash — NOT the shared version from
 // sessionStoragePortable.ts which uses Bun.hash (wyhash) when available.

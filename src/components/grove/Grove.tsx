@@ -56,10 +56,10 @@ function GracePeriodContentBody(): React.ReactNode {
         <Box paddingLeft={1}>
           <Text>
             <Text>· </Text>
-            <Text bold>You can help improve Claude </Text>
+            <Text bold>You can help improve MiMo </Text>
             <Text>
               — Allow the use of your chats and coding sessions to train and
-              improve Anthropic AI models. Change anytime in your Privacy
+              improve Xiaomi MiMo AI models. Change anytime in your Privacy
               Settings (
               <Link
                 url={'https://claude.ai/settings/data-privacy-controls'}

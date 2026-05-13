@@ -6,6 +6,7 @@
  */
 
 import { isEnvTruthy } from '../../utils/envUtils.js'
+import { isMiMoRuntime } from '../../utils/mimoRuntimeConfig.js'
 import { isTelemetryDisabled } from '../../utils/privacyLevel.js'
 
 /**
@@ -18,6 +19,7 @@ import { isTelemetryDisabled } from '../../utils/privacyLevel.js'
  */
 export function isAnalyticsDisabled(): boolean {
   return (
+    isMiMoRuntime() ||
     process.env.NODE_ENV === 'test' ||
     isEnvTruthy(process.env.CLAUDE_CODE_USE_BEDROCK) ||
     isEnvTruthy(process.env.CLAUDE_CODE_USE_VERTEX) ||
@@ -34,5 +36,9 @@ export function isAnalyticsDisabled(): boolean {
  * transcript data — enterprise customers capture responses via OTEL.
  */
 export function isFeedbackSurveyDisabled(): boolean {
-  return process.env.NODE_ENV === 'test' || isTelemetryDisabled()
+  return (
+    isMiMoRuntime() ||
+    process.env.NODE_ENV === 'test' ||
+    isTelemetryDisabled()
+  )
 }

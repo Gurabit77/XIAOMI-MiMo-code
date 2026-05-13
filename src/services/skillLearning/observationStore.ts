@@ -68,7 +68,7 @@ const DEFAULT_PURGE_MAX_AGE_DAYS = 30
 const SECRET_REPLACEMENT = '[REDACTED]'
 
 const SECRET_PATTERNS: RegExp[] = [
-  /\b(?:sk|sk-ant|sk-proj|xox[baprs])-[A-Za-z0-9_-]{12,}\b/g,
+  /\b(?:sk|sk-ant|sk-proj|tp|xox[baprs])-[A-Za-z0-9_-]{12,}\b/g,
   /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g,
   /\b(?:api[_-]?key|token|secret|password|authorization)\b\s*[:=]\s*["']?[^"',\s}]+/gi,
   /\bBearer\s+[A-Za-z0-9._~+/=-]{12,}\b/gi,

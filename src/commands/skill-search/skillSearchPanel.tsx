@@ -17,13 +17,13 @@ const ABOUT_TEXT = `# Skill Search (自动技能匹配)
 
 Skill Search 控制对话中的自动技能匹配功能。
 
-启用后，Claude Code 会在每轮对话中自动搜索并加载与当前任务最相关的 skill 文件，
+启用后，MiMo Code 会在每轮对话中自动搜索并加载与当前任务最相关的 skill 文件，
 无需手动指定。搜索基于 TF-IDF 向量余弦相似度，支持英文词干化和 CJK bi-gram 分词。
 
 ## 工作原理
 1. 对话开始时，自动索引 .claude/skills/ 和 ~/.claude/skills/ 下的 Markdown 文件
 2. 每轮对话根据上下文自动匹配最相关的 skill
-3. 匹配到的 skill 内容会作为上下文注入，指导 Claude Code 的行为
+3. 匹配到的 skill 内容会作为上下文注入，指导 MiMo Code 的行为
 
 ## 控制方式
 - /skill-search start  — 启用自动匹配

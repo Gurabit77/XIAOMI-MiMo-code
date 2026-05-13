@@ -90,7 +90,7 @@ function formatPathLink(filePath: string): string {
 
 export function shouldOfferTerminalSetup(): boolean {
   // iTerm2, WezTerm, Ghostty, Kitty, and Warp natively support CSI u / Kitty
-  // keyboard protocol, which Claude Code already parses. No setup needed for
+  // keyboard protocol, which MiMo Code already parses. No setup needed for
   // these terminals.
   return (
     (platform() === 'darwin' && env.terminal === 'Apple_Terminal') ||

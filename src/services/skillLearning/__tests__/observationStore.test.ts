@@ -23,6 +23,9 @@ describe('observationStore', () => {
   test('scrubs secrets and truncates large fields', () => {
     const scrubbed = scrubText('api_key: sk-ant-1234567890abcdef extra', 80)
     expect(scrubbed).toContain('[REDACTED]')
+    expect(scrubText('api-key: tp-12345678901234567890abcdef', 80)).toContain(
+      '[REDACTED]',
+    )
 
     const truncated = scrubText(
       `api_key: sk-ant-1234567890abcdef ${'x'.repeat(120)}`,

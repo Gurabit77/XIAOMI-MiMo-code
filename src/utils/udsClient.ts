@@ -1,5 +1,5 @@
 /**
- * UDS Client — connect to peer Claude Code sessions via Unix Domain Sockets.
+ * UDS Client — connect to peer MiMo Code sessions via Unix Domain Sockets.
  *
  * Peers are discovered by reading the PID-file registry in ~/.claude/sessions/
  * (written by concurrentSessions.ts) and checking each entry's

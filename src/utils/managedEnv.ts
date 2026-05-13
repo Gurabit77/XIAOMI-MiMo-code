@@ -13,6 +13,7 @@ import {
   getSettings_DEPRECATED,
   getSettingsForSource,
 } from './settings/settings.js'
+import { applyMiMoRuntimeConfig, isMiMoRuntime } from './mimoRuntimeConfig.js'
 
 /**
  * `claude ssh` remote: ANTHROPIC_UNIX_SOCKET routes auth through a -R forwarded
@@ -175,6 +176,11 @@ export function applySafeConfigEnvironmentVariables(): void {
       process.env[key] = value
     }
   }
+
+  // MiMo Code: re-enforce after safe env vars applied
+  if (isMiMoRuntime()) {
+    applyMiMoRuntimeConfig()
+  }
 }
 
 /**
@@ -188,6 +194,11 @@ export function applyConfigEnvironmentVariables(): void {
   Object.assign(process.env, filterSettingsEnv(getGlobalConfig().env))
 
   Object.assign(process.env, filterSettingsEnv(getSettings_DEPRECATED()?.env))
+
+  // MiMo Code: re-enforce MiMo config after settings override
+  if (isMiMoRuntime()) {
+    applyMiMoRuntimeConfig()
+  }
 
   // Clear caches so agents are rebuilt with the new env vars
   clearCACertsCache()

@@ -42,7 +42,7 @@ export const SPINNER_VERBS = [
   'Channelling',
   'Choreographing',
   'Churning',
-  'Clauding',
+  'MiMo-ing',
   'Coalescing',
   'Cogitating',
   'Combobulating',

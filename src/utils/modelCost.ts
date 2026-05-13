@@ -22,6 +22,7 @@ import {
   getDefaultMainLoopModelSetting,
   type ModelShortName,
 } from './model/model.js'
+import { isMiMoRuntime } from './mimoRuntimeConfig.js'
 
 // @see https://platform.claude.com/docs/en/about-claude/pricing
 export type ModelCosts = {
@@ -87,6 +88,13 @@ export const COST_HAIKU_45 = {
 } as const satisfies ModelCosts
 
 const DEFAULT_UNKNOWN_MODEL_COST = COST_TIER_5_25
+const COST_UNKNOWN_MIMO = {
+  inputTokens: 0,
+  outputTokens: 0,
+  promptCacheWriteTokens: 0,
+  promptCacheReadTokens: 0,
+  webSearchRequests: 0,
+} as const satisfies ModelCosts
 
 /**
  * Get the cost tier for Opus 4.6 based on fast mode.
@@ -143,6 +151,11 @@ function tokensToUSDCost(modelCosts: ModelCosts, usage: Usage): number {
 
 export function getModelCosts(model: string, usage: Usage): ModelCosts {
   const shortName = getCanonicalName(model)
+
+  if (isMiMoRuntime()) {
+    trackUnknownModelCost(model, shortName)
+    return COST_UNKNOWN_MIMO
+  }
 
   // Check if this is an Opus 4.6 model with fast mode active.
   if (

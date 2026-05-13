@@ -233,6 +233,9 @@ export const getAllModelBetas = memoize((model: string): string[] => {
   const betaHeaders = []
   const isHaiku = getCanonicalName(model).includes('haiku')
   const provider = getAPIProvider()
+  if (provider === 'mimo') {
+    return []
+  }
   const includeFirstPartyOnlyBetas = shouldIncludeFirstPartyOnlyBetas()
 
   if (!isHaiku) {
@@ -377,6 +380,10 @@ export function getMergedBetas(
   model: string,
   options?: { isAgenticQuery?: boolean },
 ): string[] {
+  if (getAPIProvider() === 'mimo') {
+    return []
+  }
+
   const baseBetas = [...getModelBetas(model)]
 
   // Agentic queries always need claude-code and cli-internal beta headers.

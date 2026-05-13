@@ -7,7 +7,7 @@ export function registerWeixinBuiltinPlugin(): void {
   registerBuiltinPlugin({
     name: 'weixin',
     description:
-      'WeChat channel integration. Enables inbound WeChat messages via channels and provides reply/send_typing MCP tools. Configure with `ccb weixin login` and enable for a session with `--channels plugin:weixin@builtin`.',
+      'WeChat channel integration. Enables inbound WeChat messages via channels and provides reply/send_typing MCP tools. Configure with `mimo weixin login` and enable for a session with `--channels plugin:weixin@builtin`.',
     version: MACRO.VERSION,
     defaultEnabled: true,
     mcpServers: {

@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Box, Text } from '@anthropic/ink'
 import { env } from '../../utils/env.js'
+import { isMiMoRuntime } from '../../utils/mimoRuntimeConfig.js'
 
 export type ClawdPose =
   | 'default'
@@ -51,6 +52,19 @@ const APPLE_EYES: Record<ClawdPose, string> = {
 }
 
 export function Clawd({ pose = 'default' }: Props = {}): React.ReactNode {
+  // MiMo Code: show MiMo ASCII art text logo
+  if (isMiMoRuntime()) {
+    return (
+      <Box flexDirection="column">
+        <Text color="claude">{'███╗   ███╗ ██╗ ███╗   ███╗  ██████╗'}</Text>
+        <Text color="claude">{'████╗ ████║ ██║ ████╗ ████║ ██╔═══██╗'}</Text>
+        <Text color="claude">{'██╔████╔██║ ██║ ██╔████╔██║ ██║   ██║'}</Text>
+        <Text color="claude">{'██║╚██╔╝██║ ██║ ██║╚██╔╝██║ ██║   ██║'}</Text>
+        <Text color="claude">{'██║ ╚═╝ ██║ ██║ ██║ ╚═╝ ██║ ╚██████╔╝'}</Text>
+        <Text color="claude">{'╚═╝     ╚═╝ ╚═╝ ╚═╝     ╚═╝  ╚═════╝'}</Text>
+      </Box>
+    )
+  }
   if (env.terminal === 'Apple_Terminal') {
     return <AppleTerminalClawd pose={pose} />
   }

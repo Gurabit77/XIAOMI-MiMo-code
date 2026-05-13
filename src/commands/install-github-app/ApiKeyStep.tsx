@@ -108,7 +108,7 @@ export function ApiKeyStep({
               {selectedOption === 'existing'
                 ? color('success', theme)('> ')
                 : '  '}
-              Use your existing Claude Code API key
+              Use your existing MiMo Code API key
             </Text>
           </Box>
         )}

@@ -86,8 +86,8 @@ export function UltraplanLaunchDialog({ onChoice }: UltraplanLaunchDialogProps):
   }, [handleChoice])
 
   const runDescription = isBridgeEnabled
-    ? 'Disable remote control and launch in Claude Code on the web'
-    : 'launch in Claude Code on the web';
+    ? 'Disable remote control and launch in MiMo Code on the web'
+    : 'launch in MiMo Code on the web';
 
   const options = [
     {
@@ -111,7 +111,7 @@ export function UltraplanLaunchDialog({ onChoice }: UltraplanLaunchDialogProps):
             showTermsLink
               ? (
                   <Text dimColor>
-                  For more information on Claude Code on the web:
+                  For more information on MiMo Code on the web:
                   <Link url={CCR_TERMS_URL}>{CCR_TERMS_URL}</Link>
                   </Text>
                 )

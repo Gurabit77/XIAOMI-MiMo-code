@@ -1,5 +1,5 @@
 /**
- * `claude rollback [target]` — roll back to a previous Claude Code version.
+ * `claude rollback [target]` — roll back to a previous MiMo Code version.
  *
  * ANT-only command (USER_TYPE === "ant").
  *

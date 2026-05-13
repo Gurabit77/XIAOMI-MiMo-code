@@ -234,7 +234,7 @@ async function processMessage(
     try {
       await sendText({
         to: fromUserId,
-        text: `Your pairing code is: ${code}\n\nAsk the operator to confirm:\nccb weixin access pair ${code}`,
+        text: `Your pairing code is: ${code}\n\nAsk the operator to confirm:\nmimo weixin access pair ${code}`,
         baseUrl: ctx.baseUrl,
         token: ctx.token,
         contextToken: msg.context_token || '',

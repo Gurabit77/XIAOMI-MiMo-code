@@ -1,13 +1,14 @@
 /**
  * LAN Beacon — UDP multicast peer discovery for Pipes system.
  *
- * Uses multicast group 224.0.71.67 ("CC" = Claude Code ASCII) on port 7101
+ * Uses multicast group 224.0.71.67 ("CC" = MiMo Code ASCII) on port 7101
  * to announce and discover CLI instances on the local network.
  *
  * Feature-gated by LAN_PIPES.
  */
 
 import { createSocket, type Socket as DgramSocket } from 'dgram'
+import { createHmac, randomBytes } from 'crypto'
 import { EventEmitter } from 'events'
 import { logError } from './log.js'
 
@@ -33,6 +34,63 @@ export type LanAnnounce = {
   tcpPort: number
   role: 'main' | 'sub'
   ts: number
+  hmac?: string
+}
+
+// ---------------------------------------------------------------------------
+// HMAC authentication — prevents rogue LAN peers from spoofing identity.
+//
+// A per-user shared secret is stored at ~/.claude/lan-beacon-key. All MiMo
+// instances for the same OS user share this key. Announce packets include an
+// HMAC-SHA256 of the payload; receivers silently drop packets with missing or
+// invalid HMAC. The key is 32 random bytes, hex-encoded.
+// ---------------------------------------------------------------------------
+
+const LAN_KEY_FILE = (() => {
+  const os = require('os') as typeof import('os')
+  const path = require('path') as typeof import('path')
+  return path.join(os.homedir(), '.claude', 'lan-beacon-key')
+})()
+
+let _lanKey: string | null = null
+
+function getLanKey(): string {
+  if (_lanKey) return _lanKey
+  const fs = require('fs') as typeof import('fs')
+  const path = require('path') as typeof import('path')
+  try {
+    _lanKey = fs.readFileSync(LAN_KEY_FILE, 'utf8').trim()
+  } catch {
+    // Generate a new key and persist it
+    _lanKey = randomBytes(32).toString('hex')
+    try {
+      fs.mkdirSync(path.dirname(LAN_KEY_FILE), { recursive: true })
+      fs.writeFileSync(LAN_KEY_FILE, _lanKey, { mode: 0o600 })
+    } catch {
+      // Non-fatal: HMAC will still work for this session
+    }
+  }
+  return _lanKey
+}
+
+function signPayload(json: string): string {
+  return createHmac('sha256', getLanKey()).update(json).digest('hex')
+}
+
+/** @internal — exposed for testing only */
+export function _setLanKeyForTesting(key: string): void {
+  _lanKey = key
+}
+
+function verifyPayload(json: string, hmac: string): boolean {
+  const expected = signPayload(json)
+  // Constant-time comparison
+  if (expected.length !== hmac.length) return false
+  let result = 0
+  for (let i = 0; i < expected.length; i++) {
+    result |= expected.charCodeAt(i) ^ hmac.charCodeAt(i)
+  }
+  return result === 0
 }
 
 // ---------------------------------------------------------------------------
@@ -89,9 +147,17 @@ export class LanBeacon extends EventEmitter {
 
       this.socket.on('message', (buf, rinfo) => {
         try {
-          const msg = JSON.parse(buf.toString()) as LanAnnounce
+          const raw = buf.toString()
+          const msg = JSON.parse(raw) as LanAnnounce
           if (msg.proto !== 'claude-pipe-v1') return
           if (msg.pipeName === this.announce.pipeName) return // ignore self
+
+          // Verify HMAC — drop unauthenticated packets silently.
+          // This prevents rogue peers on the same LAN from spoofing identity.
+          if (!msg.hmac) return
+          const { hmac, ...payloadFields } = msg
+          const payloadJson = JSON.stringify(payloadFields)
+          if (!verifyPayload(payloadJson, hmac)) return
 
           const isNew = !this.peers.has(msg.pipeName)
           this.peers.set(msg.pipeName, { ...msg, ts: Date.now() })
@@ -178,9 +244,10 @@ export class LanBeacon extends EventEmitter {
   private sendAnnounce(): void {
     if (!this.socket) return
     try {
-      const payload = Buffer.from(
-        JSON.stringify({ ...this.announce, ts: Date.now() }),
-      )
+      const body = { ...this.announce, ts: Date.now() }
+      const bodyJson = JSON.stringify(body)
+      const hmac = signPayload(bodyJson)
+      const payload = Buffer.from(JSON.stringify({ ...body, hmac }))
       this.socket.send(
         payload,
         0,

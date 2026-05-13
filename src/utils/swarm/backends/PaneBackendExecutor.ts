@@ -155,7 +155,7 @@ export class PaneBackendExecutor implements TeammateExecutor {
         await this.backend.enablePaneBorderStatus()
       }
 
-      // Build the command to spawn Claude Code with teammate identity
+      // Build the command to spawn MiMo Code with teammate identity
       const binaryPath = getTeammateCommand()
 
       // Build teammate identity CLI args

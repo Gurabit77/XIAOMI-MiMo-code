@@ -20,7 +20,7 @@ export function EnvironmentList({ environments, onSelectEnvironment }: Environme
     <div className="space-y-2">
       {environments.map((env) => {
         const isAcp = env.worker_type === "acp";
-        const typeLabel = isAcp ? "ACP Agent" : "Claude Code";
+        const typeLabel = isAcp ? "ACP Agent" : "MiMo Code";
         const typeColor = isAcp ? "bg-brand/15 text-brand" : "bg-status-running/15 text-status-running";
 
         return (

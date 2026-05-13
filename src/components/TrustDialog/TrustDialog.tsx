@@ -199,7 +199,7 @@ export function TrustDialog({ onDone, commands }: Props): React.ReactNode {
           first.
         </Text>
         <Text>
-          Claude Code{"'"}ll be able to read, edit, and execute files here.
+          MiMo Code{"'"}ll be able to read, edit, and execute files here.
         </Text>
 
         <Text dimColor>

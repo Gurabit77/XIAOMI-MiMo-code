@@ -75,7 +75,7 @@ export function TeleportRepoMismatchDialog({
           <Box flexDirection="column" gap={1}>
             {errorMessage && <Text color="error">{errorMessage}</Text>}
             <Text>
-              Open Claude Code in <Text bold>{targetRepo}</Text>:
+              Open MiMo Code in <Text bold>{targetRepo}</Text>:
             </Text>
           </Box>
 

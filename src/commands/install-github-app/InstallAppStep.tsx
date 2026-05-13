@@ -16,10 +16,10 @@ export function InstallAppStep({ repoUrl, onSubmit }: InstallAppStepProps) {
   return (
     <Box flexDirection="column" borderStyle="round" borderDimColor paddingX={1}>
       <Box flexDirection="column" marginBottom={1}>
-        <Text bold>Install the Claude GitHub App</Text>
+        <Text bold>Install the MiMo GitHub App</Text>
       </Box>
       <Box marginBottom={1}>
-        <Text>Opening browser to install the Claude GitHub App…</Text>
+        <Text>Opening browser to install the MiMo GitHub App…</Text>
       </Box>
       <Box marginBottom={1}>
         <Text>If your browser doesn&apos;t open automatically, visit:</Text>

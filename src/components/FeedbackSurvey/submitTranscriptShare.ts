@@ -6,6 +6,7 @@ import { logForDebugging } from '../../utils/debug.js'
 import { errorMessage } from '../../utils/errors.js'
 import { getAuthHeaders, getUserAgent } from '../../utils/http.js'
 import { normalizeMessagesForAPI } from '../../utils/messages.js'
+import { isMiMoRuntime } from '../../utils/mimoRuntimeConfig.js'
 import {
   extractAgentIdsFromMessages,
   getTranscriptPath,
@@ -31,6 +32,10 @@ export async function submitTranscriptShare(
   trigger: TranscriptShareTrigger,
   appearanceId: string,
 ): Promise<TranscriptShareResult> {
+  if (isMiMoRuntime()) {
+    return { success: false }
+  }
+
   try {
     logForDebugging('Collecting transcript for sharing', { level: 'info' })
 

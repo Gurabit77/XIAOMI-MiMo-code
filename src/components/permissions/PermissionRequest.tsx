@@ -171,11 +171,11 @@ function getNotificationMessage(toolUseConfirm: ToolUseConfirm): string {
   )
 
   if (toolUseConfirm.tool === ExitPlanModeV2Tool) {
-    return 'Claude Code needs your approval for the plan'
+    return 'MiMo Code needs your approval for the plan'
   }
 
   if (toolUseConfirm.tool === EnterPlanModeTool) {
-    return 'Claude Code wants to enter plan mode'
+    return 'MiMo Code wants to enter plan mode'
   }
 
   if (
@@ -186,7 +186,7 @@ function getNotificationMessage(toolUseConfirm: ToolUseConfirm): string {
   }
 
   if (!toolName || toolName.trim() === '') {
-    return 'Claude Code needs your attention'
+    return 'MiMo Code needs your attention'
   }
 
   return `Claude needs your permission to use ${toolName}`

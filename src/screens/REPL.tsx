@@ -1278,7 +1278,7 @@ export function REPL({
   } | null>(null);
 
   // Track local JSX commands separately so tools can't overwrite them.
-  // This enables "immediate" commands (like /btw) to persist while Claude is processing.
+  // This enables "immediate" commands (like /btw) to persist while MiMo is processing.
   const localJSXCommandRef = useRef<{
     jsx: React.ReactNode | null;
     shouldHidePromptInput: boolean;
@@ -1374,7 +1374,7 @@ export function REPL({
   // session from mid-conversation context.
   const haikuTitleAttemptedRef = useRef((initialMessages?.length ?? 0) > 0);
   const agentTitle = mainThreadAgentDefinition?.agentType;
-  const terminalTitle = sessionTitle ?? agentTitle ?? haikuTitle ?? 'Claude Code';
+  const terminalTitle = sessionTitle ?? agentTitle ?? haikuTitle ?? 'MiMo Code';
   const isWaitingForApproval =
     toolUseConfirmQueue.length > 0 || promptQueue.length > 0 || pendingWorkerRequest || pendingSandboxRequest;
   // Local-jsx commands (like /plugin, /config) show user-facing dialogs that
@@ -1388,7 +1388,7 @@ export function REPL({
   // here because onQueryImpl reads them (background session description,
   // haiku title extraction gate).
 
-  // Prevent macOS from sleeping while Claude is working
+  // Prevent macOS from sleeping while MiMo is working
   useEffect(() => {
     if (isLoading && !isWaitingForApproval && !isShowingLocalJSXCommand) {
       startPreventSleep();
@@ -3128,8 +3128,8 @@ export function REPL({
           // Relay assistant response to master when in slave mode.
           if (feature('UDS_INBOX') && newMessage.type === 'assistant') {
             // Extract text from content blocks (API format)
-            const msg = newMessage.message as any;
-            const contentBlocks = msg?.content ?? (newMessage as any).content ?? [];
+            const msg = newMessage.message;
+            const contentBlocks = msg?.content ?? [];
             const textParts: string[] = [];
             if (Array.isArray(contentBlocks)) {
               for (const block of contentBlocks) {
@@ -3215,7 +3215,7 @@ export function REPL({
       // which was broken by SessionStart hook messages (prepended via
       // useDeferredHookMessages) and attachment messages (appended by
       // processTextPrompt) — both pushed length past 1 on turn one, so the
-      // title silently fell through to the "Claude Code" default.
+      // title silently fell through to the "MiMo Code" default.
       if (!titleDisabled && !sessionTitle && !agentTitle && !haikuTitleAttemptedRef.current) {
         const firstUserMessage = newMessages.find(m => m.type === 'user' && !m.isMeta);
         const text =
@@ -3859,7 +3859,7 @@ export function REPL({
       }
 
       // Handle immediate commands - these bypass the queue and execute right away
-      // even while Claude is processing. Commands opt-in via `immediate: true`.
+      // even while MiMo is processing. Commands opt-in via `immediate: true`.
       // Commands triggered via keybindings are always treated as immediate.
       if (!speculationAccept && input.trim().startsWith('/')) {
         // Expand [Pasted text #N] refs so immediate commands (e.g. /btw) receive
@@ -4736,7 +4736,7 @@ export function REPL({
         ) {
           void sendNotification(
             {
-              message: 'Claude is waiting for your input',
+              message: 'MiMo is waiting for your input',
               notificationType: 'idle_prompt',
             },
             terminal,
@@ -4909,7 +4909,7 @@ export function REPL({
   useMailboxBridge({ isLoading, onSubmitMessage: handleIncomingPrompt });
   useMasterMonitor();
   useSlaveNotifications();
-  const pipeIpcState = useAppState(s => getPipeIpc(s as any));
+  const pipeIpcState = useAppState(s => getPipeIpc(s as unknown as Record<string, unknown>));
 
   usePipePermissionForward({ store, tools, setMessages, setToolUseConfirmQueue, getToolUseContext, mainLoopModel });
   usePipeMuteSync({ setToolUseConfirmQueue });
@@ -5030,7 +5030,7 @@ export function REPL({
     const handleSuspend = () => {
       // Print suspension instructions
       process.stdout.write(
-        `\nClaude Code has been suspended. Run \`fg\` to bring Claude Code back.\nNote: ctrl + z now suspends Claude Code, ctrl + _ undoes input.\n`,
+        `\nMiMo Code has been suspended. Run \`fg\` to bring MiMo Code back.\nNote: ctrl + z now suspends MiMo Code, ctrl + _ undoes input.\n`,
       );
     };
 
@@ -5674,7 +5674,7 @@ export function REPL({
                   it would sit at the last visible transcript row right above
                   the ▔ divider, showing "❯ /config" as redundant clutter
                   (the modal IS the /config UI). Outside modals it stays so
-                  the user sees their input echoed while Claude processes. */}
+                  the user sees their input echoed while MiMo processes. */}
               {!disabled && placeholderText && !centeredModal && (
                 <UserTextMessage param={{ text: placeholderText, type: 'text' }} addMargin={true} verbose={verbose} />
               )}
@@ -6173,7 +6173,7 @@ export function REPL({
                         inputValue={inputValue}
                         setInputValue={setInputValue}
                         onRequestFeedback={handleSurveyRequestFeedback}
-                        message="How well did Claude use its memory? (optional)"
+                        message="How well did MiMo use its memory? (optional)"
                       />
                     ) : (
                       <FeedbackSurvey

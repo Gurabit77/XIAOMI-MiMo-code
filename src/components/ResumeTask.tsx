@@ -135,10 +135,10 @@ export function ResumeTask({
       <Box flexDirection="column" padding={1}>
         <Box flexDirection="row">
           <Spinner />
-          <Text bold>Loading Claude Code sessions…</Text>
+          <Text bold>Loading MiMo Code sessions…</Text>
         </Box>
         <Text dimColor>
-          {retrying ? 'Retrying…' : 'Fetching your Claude Code sessions…'}
+          {retrying ? 'Retrying…' : 'Fetching your MiMo Code sessions…'}
         </Text>
       </Box>
     )
@@ -148,7 +148,7 @@ export function ResumeTask({
     return (
       <Box flexDirection="column" padding={1}>
         <Text bold color="error">
-          Error loading Claude Code sessions
+          Error loading MiMo Code sessions
         </Text>
 
         {renderErrorSpecificGuidance(loadErrorType)}
@@ -165,7 +165,7 @@ export function ResumeTask({
     return (
       <Box flexDirection="column" padding={1}>
         <Text bold>
-          No Claude Code sessions found
+          No MiMo Code sessions found
           {currentRepo && <Text> for {currentRepo}</Text>}
         </Text>
         <Box marginTop={1}>
@@ -339,7 +339,7 @@ function renderErrorSpecificGuidance(
     case 'other':
       return (
         <Box marginY={1} flexDirection="row">
-          <Text dimColor>Sorry, Claude Code encountered an error</Text>
+          <Text dimColor>Sorry, MiMo Code encountered an error</Text>
         </Box>
       )
   }

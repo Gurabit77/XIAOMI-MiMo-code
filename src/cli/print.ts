@@ -792,12 +792,12 @@ export async function runHeadless(
     return
   }
 
+  // stream-json implicitly requires verbose to emit messages — auto-enable it
+  // rather than erroring out, matching the SDK URL path behavior (main.tsx ~L2048).
+  // This prevents silent-exit when external tools (e.g. LLMCouncil) invoke
+  // `mimo -p --output-format stream-json` without --verbose.
   if (options.outputFormat === 'stream-json' && !options.verbose) {
-    process.stderr.write(
-      'Error: When using --print, --output-format=stream-json requires --verbose\n',
-    )
-    gracefulShutdownSync(1)
-    return
+    options.verbose = true
   }
 
   // Filter out MCP tools that are in the deny list
@@ -868,6 +868,21 @@ export async function runHeadless(
       ? createStreamlinedTransformer()
       : null
 
+  // Heartbeat: in non-stream (text/json) mode, MiMo produces zero stdout until
+  // the task completes. External callers (LLMCouncil, scripts) that monitor
+  // stdout may kill MiMo as "hung" after a timeout. Write a periodic heartbeat
+  // to stderr so they can detect MiMo is still alive.
+  let heartbeatTimer: ReturnType<typeof setInterval> | undefined
+  if (options.outputFormat !== 'stream-json') {
+    const HEARTBEAT_INTERVAL_MS = 10_000
+    heartbeatTimer = setInterval(() => {
+      process.stderr.write(
+        `[mimo] heartbeat: running (${Math.round(process.uptime())}s elapsed)\n`,
+      )
+    }, HEARTBEAT_INTERVAL_MS)
+    heartbeatTimer.unref()
+  }
+
   headlessProfilerCheckpoint('before_runHeadlessStreaming')
   for await (const message of runHeadlessStreaming(
     structuredIO,
@@ -920,6 +935,11 @@ export async function runHeadless(
       }
       lastMessage = message
     }
+  }
+
+  // Stop heartbeat now that streaming is done
+  if (heartbeatTimer) {
+    clearInterval(heartbeatTimer)
   }
 
   switch (options.outputFormat) {

@@ -11,6 +11,11 @@ import {
   refreshGcpCredentialsIfNeeded,
 } from 'src/utils/auth.js'
 import { getUserAgent } from 'src/utils/http.js'
+import {
+  getConfiguredMiMoApiKey,
+  getMiMoMissingApiKeyMessage,
+  isMiMoRuntime,
+} from 'src/utils/mimoRuntimeConfig.js'
 import { getSmallFastModel } from 'src/utils/model/model.js'
 import {
   getAPIProvider,
@@ -98,7 +103,8 @@ export async function getAnthropicClient({
   const remoteSessionId = process.env.CLAUDE_CODE_REMOTE_SESSION_ID
   const clientApp = process.env.CLAUDE_AGENT_SDK_CLIENT_APP
   const customHeaders = getCustomHeaders()
-  const defaultHeaders: { [key: string]: string } = {
+  const mimoRuntime = isMiMoRuntime()
+  const defaultHeaders: Record<string, string | null> = {
     'x-app': 'cli',
     'User-Agent': getUserAgent(),
     'X-Claude-Code-Session-Id': getSessionId(),
@@ -115,6 +121,16 @@ export async function getAnthropicClient({
       : {}),
   }
 
+  if (mimoRuntime) {
+    const mimoApiKey = getConfiguredMiMoApiKey()
+    if (!mimoApiKey) {
+      throw new Error(getMiMoMissingApiKeyMessage())
+    }
+    defaultHeaders['api-key'] = mimoApiKey
+    defaultHeaders['x-api-key'] = null
+    defaultHeaders['Authorization'] = null
+  }
+
   // Log API client configuration for HFI debugging
   logForDebugging(
     `[API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: ${!!process.env.ANTHROPIC_CUSTOM_HEADERS}, has Authorization header: ${!!customHeaders['Authorization']}`,
@@ -128,12 +144,14 @@ export async function getAnthropicClient({
     defaultHeaders['x-anthropic-additional-protection'] = 'true'
   }
 
-  logForDebugging('[API:auth] OAuth token check starting')
-  await checkAndRefreshOAuthTokenIfNeeded()
-  logForDebugging('[API:auth] OAuth token check complete')
+  if (!mimoRuntime) {
+    logForDebugging('[API:auth] OAuth token check starting')
+    await checkAndRefreshOAuthTokenIfNeeded()
+    logForDebugging('[API:auth] OAuth token check complete')
 
-  if (!isClaudeAISubscriber()) {
-    await configureApiKeyHeaders(defaultHeaders, getIsNonInteractiveSession())
+    if (!isClaudeAISubscriber()) {
+      await configureApiKeyHeaders(defaultHeaders, getIsNonInteractiveSession())
+    }
   }
 
   const resolvedFetch = buildFetch(fetchOverride, source)
@@ -299,10 +317,15 @@ export async function getAnthropicClient({
 
   // Determine authentication method based on available tokens
   const clientConfig: ConstructorParameters<typeof Anthropic>[0] = {
-    apiKey: isClaudeAISubscriber() ? null : apiKey || getAnthropicApiKey(),
-    authToken: isClaudeAISubscriber()
-      ? getClaudeAIOAuthTokens()?.accessToken
-      : undefined,
+    apiKey: mimoRuntime
+      ? null
+      : isClaudeAISubscriber()
+        ? null
+        : apiKey || getAnthropicApiKey(),
+    authToken:
+      !mimoRuntime && isClaudeAISubscriber()
+        ? getClaudeAIOAuthTokens()?.accessToken
+        : undefined,
     // Set baseURL from OAuth config when using staging OAuth
     ...(process.env.USER_TYPE === 'ant' &&
     isEnvTruthy(process.env.USE_STAGING_OAUTH)
@@ -316,7 +339,7 @@ export async function getAnthropicClient({
 }
 
 async function configureApiKeyHeaders(
-  headers: Record<string, string>,
+  headers: Record<string, string | null>,
   isNonInteractiveSession: boolean,
 ): Promise<void> {
   const token =

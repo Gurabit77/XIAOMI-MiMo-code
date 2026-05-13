@@ -23,7 +23,7 @@ import {
  * consumes LLM output the same way it consumes heuristic output.
  *
  * Design notes:
- * - Reuses `queryHaiku` (goes through the full Claude Code API stack:
+ * - Reuses `queryHaiku` (goes through the full MiMo Code API stack:
  *   OAuth, beta headers, providers, VCR in tests). No new auth code.
  * - Caps input to the tail of the observation buffer so the prompt stays
  *   small and predictable, and runs under a 10-second abort signal so a

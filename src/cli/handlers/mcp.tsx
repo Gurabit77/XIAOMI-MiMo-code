@@ -426,6 +426,6 @@ export async function mcpResetChoicesHandler(): Promise<void> {
   }))
   cliOk(
     'All project-scoped (.mcp.json) server approvals and rejections have been reset.\n' +
-      'You will be prompted for approval next time you start Claude Code.',
+      'You will be prompted for approval next time you start MiMo Code.',
   )
 }

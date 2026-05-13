@@ -73,7 +73,7 @@ export function AgentDetail({ agent, tools, onBack }: Props): React.ReactNode {
 
       <Box flexDirection="column">
         <Text>
-          <Text bold>Description</Text> (tells Claude when to use this agent):
+          <Text bold>Description</Text> (tells MiMo when to use this agent):
         </Text>
         <Box marginLeft={2}>
           <Text>{agent.whenToUse}</Text>

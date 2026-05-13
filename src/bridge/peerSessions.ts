@@ -39,7 +39,7 @@ export async function listBridgePeers(): Promise<BridgePeerSession[]> {
 }
 
 /**
- * Send a plain-text message to another Claude session via the bridge API.
+ * Send a plain-text message to another MiMo session via the bridge API.
  *
  * Called by SendMessageTool when the target address scheme is "bridge:".
  * Uses the current ReplBridgeHandle to derive the sender identity and

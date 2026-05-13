@@ -157,7 +157,7 @@ function startDetachedPoll(
         setAppState(prev => (prev.ultraplanSessionUrl === url ? { ...prev, ultraplanSessionUrl: undefined } : prev));
         enqueuePendingNotification({
           value: [
-            `Ultraplan approved — executing in Claude Code on the web. Follow along at: ${url}`,
+            `Ultraplan approved — executing in MiMo Code on the web. Follow along at: ${url}`,
             '',
             'Results will land as a pull request when the remote session finishes. There is nothing to do here.',
           ].join('\n'),
@@ -223,11 +223,11 @@ function startDetachedPoll(
 // multi-second teleportToRemote round-trip.
 function buildLaunchMessage(disconnectedBridge?: boolean): string {
   const prefix = disconnectedBridge ? `${REMOTE_CONTROL_DISCONNECTED_MSG} ` : '';
-  return `${DIAMOND_OPEN} ultraplan\n${prefix}Starting Claude Code on the web…`;
+  return `${DIAMOND_OPEN} ultraplan\n${prefix}Starting MiMo Code on the web…`;
 }
 
 function buildSessionReadyMessage(url: string): string {
-  return `${DIAMOND_OPEN} ultraplan · Monitor progress in Claude Code on the web ${url}\nYou can continue working — when the ${DIAMOND_OPEN} fills, press ↓ to view results`;
+  return `${DIAMOND_OPEN} ultraplan · Monitor progress in MiMo Code on the web ${url}\nYou can continue working — when the ${DIAMOND_OPEN} fills, press ↓ to view results`;
 }
 
 function buildAlreadyActiveMessage(url: string | undefined): string {
@@ -322,7 +322,7 @@ export async function launchUltraplan(opts: {
       'in your prompt',
       '',
       // 'Advanced multi-agent plan mode with our most powerful model',
-      // '(Opus). Runs in Claude Code on the web. When the plan is ready,',
+      // '(Opus). Runs in MiMo Code on the web. When the plan is ready,',
       // 'you can execute it in the web session or send it back here.',
       // 'Terminal stays free while the remote plans.',
       // 'Requires /login.',
@@ -517,7 +517,7 @@ const call: LocalJSXCommandCall = async (onDone, context, args) => {
 export default {
   type: 'local-jsx',
   name: 'ultraplan',
-  description: `~10–30 min · Claude Code on the web drafts an advanced plan you can edit and approve. See ${CCR_TERMS_URL}`,
+  description: `~10–30 min · MiMo Code on the web drafts an advanced plan you can edit and approve. See ${CCR_TERMS_URL}`,
   argumentHint: '<prompt>',
   // isEnabled: () => process.env.USER_TYPE === 'ant',
   isEnabled: () => isUltraplanEnabled(),

@@ -4,7 +4,7 @@
  *
  * The /hooks menu is read-only: selecting an event lets you browse its
  * configured hooks but not modify them. To add or change hooks, users should
- * edit settings.json directly or ask Claude.
+ * edit settings.json directly or ask MiMo.
  */
 
 import figures from 'figures'
@@ -54,7 +54,7 @@ export function SelectEventMode({
         <Box flexDirection="column">
           <Text dimColor>
             {figures.info} This menu is read-only. To add or modify hooks, edit
-            settings.json directly or ask Claude.{' '}
+            settings.json directly or ask MiMo.{' '}
             <Link url="https://code.claude.com/docs/en/hooks">Learn more</Link>
           </Text>
         </Box>

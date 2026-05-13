@@ -42,7 +42,7 @@ export function SuccessStep({
         {skipWorkflow ? (
           <>
             <Text>
-              1. Install the Claude GitHub App if you haven&apos;t already
+              1. Install the MiMo GitHub App if you haven&apos;t already
             </Text>
             <Text>2. Your workflow file was kept unchanged</Text>
             <Text>3. API key is configured and ready to use</Text>
@@ -51,9 +51,9 @@ export function SuccessStep({
           <>
             <Text>1. A pre-filled PR page has been created</Text>
             <Text>
-              2. Install the Claude GitHub App if you haven&apos;t already
+              2. Install the MiMo GitHub App if you haven&apos;t already
             </Text>
-            <Text>3. Merge the PR to enable Claude PR assistance</Text>
+            <Text>3. Merge the PR to enable MiMo PR assistance</Text>
           </>
         )}
       </Box>
