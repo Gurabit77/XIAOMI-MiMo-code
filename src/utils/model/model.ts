@@ -81,6 +81,11 @@ export function getUserSpecifiedModelSetting(): ModelSetting | undefined {
     specifiedModel = process.env.ANTHROPIC_MODEL || settings.model || undefined
   }
 
+  // MiMo runtime: ignore non-MiMo model settings from .claude/settings.json
+  if (isMiMoRuntime() && specifiedModel && !specifiedModel.startsWith('mimo')) {
+    return undefined
+  }
+
   // Ignore the user-specified model if it's not in the availableModels allowlist.
   if (specifiedModel && !isModelAllowed(specifiedModel)) {
     return undefined
