@@ -28,6 +28,7 @@ import { getAPIProvider } from './providers.js'
 import { LIGHTNING_BOLT } from '../../constants/figures.js'
 import { isModelAllowed } from './modelAllowlist.js'
 import { type ModelAlias, isModelAlias } from './aliases.js'
+import { isMiMoRuntime } from '../mimoRuntimeConfig.js'
 import { capitalize } from '../stringUtils.js'
 
 export type ModelShortName = string
@@ -221,6 +222,11 @@ export function getRuntimeMainLoopModel(params: {
  * @returns The default model setting to use
  */
 export function getDefaultMainLoopModelSetting(): ModelName | ModelAlias {
+  // MiMo Code: default to mimo-v2.5
+  if (isMiMoRuntime()) {
+    return process.env.ANTHROPIC_DEFAULT_SONNET_MODEL || 'mimo-v2.5'
+  }
+
   // Ants default to defaultModel from flag config, or Opus 1M if not configured
   if (process.env.USER_TYPE === 'ant') {
     return (
@@ -431,6 +437,12 @@ export function getPublicModelDisplayName(model: ModelName): string | null {
     case getModelStrings().haiku35:
       return 'Haiku 3.5'
     default:
+      // MiMo models
+      if (model === 'mimo-v2.5') return 'MiMo V2.5'
+      if (model === 'mimo-v2.5-pro') return 'MiMo V2.5 Pro'
+      if (model === 'mimo-v2-pro') return 'MiMo V2 Pro'
+      if (model === 'mimo-v2-omni') return 'MiMo V2 Omni'
+      if (model.startsWith('mimo-')) return model
       return null
   }
 }
