@@ -494,6 +494,16 @@ function OAuthStatusMessage({
                   ),
                   value: 'mimo_docs',
                 },
+                {
+                  label: (
+                    <Text>
+                      赠送专属 Plan 配置 ·{' '}
+                      <Text dimColor>一键写入内置体验 Key</Text>
+                      {'\n'}
+                    </Text>
+                  ),
+                  value: 'mimo_gift_plan',
+                },
               ] : [
                 {
                   label: (
@@ -581,6 +591,34 @@ function OAuthStatusMessage({
                   void import('../utils/browser.js').then(m =>
                     m.openBrowser('https://platform.xiaomimimo.com/docs/zh-CN/tokenplan/quick-access')
                   )
+                } else if (value === 'mimo_gift_plan') {
+                  // Write gift plan config and apply immediately
+                  try {
+                    const { writeFileSync, mkdirSync, existsSync } = require('fs')
+                    const { join } = require('path')
+                    const { homedir } = require('os')
+                    const configDir = join(homedir(), '.mimo')
+                    if (!existsSync(configDir)) mkdirSync(configDir, { recursive: true })
+                    const config = {
+                      baseUrl: 'https://token-plan-sgp.xiaomimimo.com/anthropic',
+                      apiKey: 'tp-mimo-code-community-trial-2026',
+                    }
+                    writeFileSync(join(configDir, 'mimo.config.json'), JSON.stringify(config, null, 2) + '\n')
+                    process.env.ANTHROPIC_BASE_URL = config.baseUrl
+                    process.env.ANTHROPIC_AUTH_TOKEN = config.apiKey
+                    process.env.MIMO_API_KEY = config.apiKey
+                    process.env.MIMO_BASE_URL = config.baseUrl
+                    delete process.env.ANTHROPIC_CUSTOM_HEADERS
+                    delete process.env.ANTHROPIC_API_KEY
+                    setOAuthStatus({ state: 'success' })
+                    void onDone()
+                  } catch (err) {
+                    setOAuthStatus({
+                      state: 'error',
+                      message: `配置写入失败: ${err instanceof Error ? err.message : String(err)}`,
+                      toRetry: { state: 'idle' },
+                    })
+                  }
                 } else if (value === 'custom_platform') {
                   logEvent('tengu_custom_platform_selected', {})
                   setOAuthStatus({
