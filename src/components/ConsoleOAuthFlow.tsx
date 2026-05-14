@@ -30,6 +30,13 @@ type OAuthStatus =
   | { state: 'idle' } // Initial state, waiting to select login method
   | { state: 'platform_setup' } // Show platform setup info (Bedrock/Vertex/Foundry)
   | {
+      state: 'mimo_config'
+      plan: 'api_keys' | 'token_plan'
+      baseUrl: string
+      apiKey: string
+      activeField: 'base_url' | 'api_key'
+    } // MiMo API key configuration
+  | {
       state: 'custom_platform'
       baseUrl: string
       apiKey: string
@@ -447,15 +454,47 @@ function OAuthStatusMessage({
             {startingMessage
               ? startingMessage
               : isMiMoRuntime()
-                ? `MiMo Code uses your MiMo Token Plan API key. Configure your endpoint below.`
+                ? `配置 MiMo Code API 接入方式`
                 : `MiMo Code can be used with your MiMo subscription or billed based on API usage through your API account.`}
           </Text>
 
-          <Text>Select login method:</Text>
+          {isMiMoRuntime() && <Text>Select login method:</Text>}
+          {!isMiMoRuntime() && <Text>Select login method:</Text>}
 
           <Box>
             <Select
-              options={[
+              options={isMiMoRuntime() ? [
+                {
+                  label: (
+                    <Text>
+                      MiMo API Keys ·{' '}
+                      <Text dimColor>按量付费，格式 sk-xxxxx</Text>
+                      {'\n'}
+                    </Text>
+                  ),
+                  value: 'mimo_api_keys',
+                },
+                {
+                  label: (
+                    <Text>
+                      MiMo Token Plan ·{' '}
+                      <Text dimColor>固定订阅，格式 tp-xxxxx</Text>
+                      {'\n'}
+                    </Text>
+                  ),
+                  value: 'mimo_token_plan',
+                },
+                {
+                  label: (
+                    <Text>
+                      接入文档 ·{' '}
+                      <Text dimColor>打开 MiMo 平台文档</Text>
+                      {'\n'}
+                    </Text>
+                  ),
+                  value: 'mimo_docs',
+                },
+              ] : [
                 {
                   label: (
                     <Text>
@@ -488,7 +527,7 @@ function OAuthStatusMessage({
                   ),
                   value: 'gemini_api',
                 },
-                ...(!isMiMoRuntime() ? [{
+                {
                   label: (
                     <Text>
                       MiMo account with subscription ·{' '}
@@ -507,8 +546,8 @@ function OAuthStatusMessage({
                     </Text>
                   ),
                   value: 'console',
-                }] : []),
-                ...(!isMiMoRuntime() ? [{
+                },
+                {
                   label: (
                     <Text>
                       3rd-party platform ·{' '}
@@ -519,10 +558,30 @@ function OAuthStatusMessage({
                     </Text>
                   ),
                   value: 'platform',
-                }] : []),
+                },
               ]}
               onChange={value => {
-                if (value === 'custom_platform') {
+                if (value === 'mimo_api_keys') {
+                  setOAuthStatus({
+                    state: 'mimo_config',
+                    plan: 'api_keys',
+                    baseUrl: 'https://api.xiaomimimo.com/anthropic',
+                    apiKey: '',
+                    activeField: 'api_key',
+                  })
+                } else if (value === 'mimo_token_plan') {
+                  setOAuthStatus({
+                    state: 'mimo_config',
+                    plan: 'token_plan',
+                    baseUrl: 'https://token-plan-cn.xiaomimimo.com/anthropic',
+                    apiKey: '',
+                    activeField: 'api_key',
+                  })
+                } else if (value === 'mimo_docs') {
+                  void import('../utils/browser.js').then(m =>
+                    m.openBrowser('https://platform.xiaomimimo.com/docs/zh-CN/tokenplan/quick-access')
+                  )
+                } else if (value === 'custom_platform') {
                   logEvent('tengu_custom_platform_selected', {})
                   setOAuthStatus({
                     state: 'custom_platform',
@@ -573,6 +632,189 @@ function OAuthStatusMessage({
           </Box>
         </Box>
       )
+
+    case 'mimo_config':
+      {
+        type MiMoField = 'base_url' | 'api_key'
+        const MIMO_FIELDS: MiMoField[] = ['base_url', 'api_key']
+        const mc = oauthStatus as {
+          state: 'mimo_config'
+          plan: 'api_keys' | 'token_plan'
+          activeField: MiMoField
+          baseUrl: string
+          apiKey: string
+        }
+        const { activeField, baseUrl, apiKey, plan } = mc
+        const mimoDisplayValues: Record<MiMoField, string> = {
+          base_url: baseUrl,
+          api_key: apiKey,
+        }
+
+        const [mimoInputValue, setMimoInputValue] = useState(() => mimoDisplayValues[activeField])
+        const [mimoCursorOffset, setMimoCursorOffset] = useState(
+          () => mimoDisplayValues[activeField].length,
+        )
+
+        const buildMiMoState = useCallback(
+          (field: MiMoField, value: string, newActive?: MiMoField) => {
+            const s = {
+              state: 'mimo_config' as const,
+              plan,
+              activeField: newActive ?? activeField,
+              baseUrl,
+              apiKey,
+            }
+            switch (field) {
+              case 'base_url': return { ...s, baseUrl: value }
+              case 'api_key': return { ...s, apiKey: value }
+            }
+          },
+          [activeField, baseUrl, apiKey, plan],
+        )
+
+        const doMiMoSave = useCallback(() => {
+          const finalVals = { ...mimoDisplayValues, [activeField]: mimoInputValue }
+          if (!finalVals.api_key) {
+            setOAuthStatus({
+              state: 'error',
+              message: 'API Key 不能为空',
+              toRetry: { state: 'mimo_config', plan, baseUrl: finalVals.base_url, apiKey: '', activeField: 'api_key' },
+            })
+            return
+          }
+          if (finalVals.base_url) {
+            try { new URL(finalVals.base_url) } catch {
+              setOAuthStatus({
+                state: 'error',
+                message: 'Base URL 格式无效，请输入完整 URL（如 https://api.xiaomimimo.com/anthropic）',
+                toRetry: { state: 'mimo_config', plan, baseUrl: '', apiKey: finalVals.api_key, activeField: 'base_url' },
+              })
+              return
+            }
+          }
+
+          // Write to ~/.mimo/mimo.config.json and apply immediately
+          try {
+            const { writeFileSync, mkdirSync, existsSync, readFileSync } = require('fs')
+            const { join } = require('path')
+            const { homedir } = require('os')
+            const configDir = join(homedir(), '.mimo')
+            if (!existsSync(configDir)) mkdirSync(configDir, { recursive: true })
+            const configPath = join(configDir, 'mimo.config.json')
+            let existing: Record<string, unknown> = {}
+            if (existsSync(configPath)) {
+              try { existing = JSON.parse(readFileSync(configPath, 'utf8')) } catch {}
+            }
+            const config = {
+              ...existing,
+              baseUrl: finalVals.base_url,
+              apiKey: finalVals.api_key,
+            }
+            writeFileSync(configPath, JSON.stringify(config, null, 2) + '\n')
+
+            // Apply to current process immediately
+            process.env.ANTHROPIC_BASE_URL = finalVals.base_url
+            process.env.ANTHROPIC_AUTH_TOKEN = finalVals.api_key
+            process.env.ANTHROPIC_CUSTOM_HEADERS = `api-key: ${finalVals.api_key}`
+            process.env.MIMO_API_KEY = finalVals.api_key
+            process.env.MIMO_BASE_URL = finalVals.base_url
+            delete process.env.ANTHROPIC_API_KEY
+
+            setOAuthStatus({ state: 'success' })
+            void onDone()
+          } catch (err) {
+            setOAuthStatus({
+              state: 'error',
+              message: `保存配置失败: ${err instanceof Error ? err.message : String(err)}`,
+              toRetry: { state: 'mimo_config', plan, baseUrl: finalVals.base_url, apiKey: finalVals.api_key, activeField: 'base_url' },
+            })
+          }
+        }, [activeField, mimoInputValue, mimoDisplayValues, plan, setOAuthStatus, onDone])
+
+        const handleMiMoEnter = useCallback(() => {
+          const idx = MIMO_FIELDS.indexOf(activeField)
+          if (idx === MIMO_FIELDS.length - 1) {
+            setOAuthStatus(buildMiMoState(activeField, mimoInputValue))
+            doMiMoSave()
+          } else {
+            const next = MIMO_FIELDS[idx + 1]!
+            setOAuthStatus(buildMiMoState(activeField, mimoInputValue, next))
+            setMimoInputValue(mimoDisplayValues[next] ?? '')
+            setMimoCursorOffset((mimoDisplayValues[next] ?? '').length)
+          }
+        }, [activeField, mimoInputValue, buildMiMoState, doMiMoSave, mimoDisplayValues, setOAuthStatus])
+
+        useKeybinding('tabs:next', () => {
+          const idx = MIMO_FIELDS.indexOf(activeField)
+          if (idx < MIMO_FIELDS.length - 1) {
+            setOAuthStatus(buildMiMoState(activeField, mimoInputValue, MIMO_FIELDS[idx + 1]))
+            setMimoInputValue(mimoDisplayValues[MIMO_FIELDS[idx + 1]!] ?? '')
+            setMimoCursorOffset((mimoDisplayValues[MIMO_FIELDS[idx + 1]!] ?? '').length)
+          }
+        }, { context: 'FormField' })
+        useKeybinding('tabs:previous', () => {
+          const idx = MIMO_FIELDS.indexOf(activeField)
+          if (idx > 0) {
+            setOAuthStatus(buildMiMoState(activeField, mimoInputValue, MIMO_FIELDS[idx - 1]))
+            setMimoInputValue(mimoDisplayValues[MIMO_FIELDS[idx - 1]!] ?? '')
+            setMimoCursorOffset((mimoDisplayValues[MIMO_FIELDS[idx - 1]!] ?? '').length)
+          }
+        }, { context: 'FormField' })
+        useKeybinding('confirm:no', () => { setOAuthStatus({ state: 'idle' }) }, { context: 'Confirmation' })
+
+        const columns = useTerminalSize().columns - 20
+        const renderMiMoRow = (field: MiMoField, label: string, opts?: { mask?: boolean }) => {
+          const active = activeField === field
+          const val = mimoDisplayValues[field]
+          return (
+            <Box>
+              <Text backgroundColor={active ? 'suggestion' : undefined} color={active ? 'inverseText' : undefined}>
+                {` ${label} `}
+              </Text>
+              <Text> </Text>
+              {active ? (
+                <TextInput
+                  value={mimoInputValue}
+                  onChange={setMimoInputValue}
+                  onSubmit={handleMiMoEnter}
+                  cursorOffset={mimoCursorOffset}
+                  onChangeCursorOffset={setMimoCursorOffset}
+                  columns={columns}
+                  mask={opts?.mask ? '*' : undefined}
+                  focus={true}
+                />
+              ) : val ? (
+                <Text color="success">
+                  {opts?.mask ? val.slice(0, 8) + '\u00b7'.repeat(Math.max(0, val.length - 8)) : val}
+                </Text>
+              ) : null}
+            </Box>
+          )
+        }
+
+        return (
+          <Box flexDirection="column" gap={1}>
+            <Text bold>
+              {plan === 'api_keys' ? 'MiMo API Keys 配置' : 'MiMo Token Plan 配置'}
+            </Text>
+            <Text dimColor>
+              {plan === 'api_keys'
+                ? '按量付费，API Key 格式：sk-xxxxx'
+                : '固定订阅，API Key 格式：tp-xxxxx'}
+            </Text>
+            <Box flexDirection="column" gap={1}>
+              {renderMiMoRow('base_url', 'Base URL')}
+              {renderMiMoRow('api_key', 'API Key ', { mask: true })}
+            </Box>
+            <Text dimColor>
+              Tab 切换字段 · Enter 确认保存 · Esc 返回
+            </Text>
+            <Text dimColor>
+              配置将保存到 ~/.mimo/mimo.config.json 并立即生效
+            </Text>
+          </Box>
+        )
+      }
 
     case 'custom_platform':
       {
