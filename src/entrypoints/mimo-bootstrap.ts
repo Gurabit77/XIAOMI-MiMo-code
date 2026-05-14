@@ -36,6 +36,7 @@ process.env.MIMO_BASE_URL = mimoBaseUrl
 process.env.ANTHROPIC_AUTH_TOKEN = mimoApiKey
 process.env.ANTHROPIC_CUSTOM_HEADERS = mimoApiKey ? `api-key: ${mimoApiKey}` : ''
 delete process.env.ANTHROPIC_API_KEY
+delete process.env.ANTHROPIC_MODEL
 
 // Force MiMo models
 process.env.ANTHROPIC_DEFAULT_HAIKU_MODEL = 'mimo-v2.5'

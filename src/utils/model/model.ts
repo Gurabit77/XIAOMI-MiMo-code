@@ -78,7 +78,8 @@ export function getUserSpecifiedModelSetting(): ModelSetting | undefined {
     specifiedModel = modelOverride
   } else {
     const settings = getSettings_DEPRECATED() || {}
-    specifiedModel = process.env.ANTHROPIC_MODEL || settings.model || undefined
+    const envModel = isMiMoRuntime() ? undefined : process.env.ANTHROPIC_MODEL
+    specifiedModel = envModel || settings.model || undefined
   }
 
   // MiMo runtime: ignore non-MiMo model settings from .claude/settings.json

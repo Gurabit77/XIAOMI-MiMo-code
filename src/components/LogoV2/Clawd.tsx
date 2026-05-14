@@ -52,16 +52,15 @@ const APPLE_EYES: Record<ClawdPose, string> = {
 }
 
 export function Clawd({ pose = 'default' }: Props = {}): React.ReactNode {
-  // MiMo Code: show MiMo ASCII art text logo
+  // MiMo Code: show MiMo text logo
   if (isMiMoRuntime()) {
     return (
       <Box flexDirection="column">
-        <Text color="claude">{'███╗   ███╗ ██╗ ███╗   ███╗  ██████╗'}</Text>
-        <Text color="claude">{'████╗ ████║ ██║ ████╗ ████║ ██╔═══██╗'}</Text>
-        <Text color="claude">{'██╔████╔██║ ██║ ██╔████╔██║ ██║   ██║'}</Text>
-        <Text color="claude">{'██║╚██╔╝██║ ██║ ██║╚██╔╝██║ ██║   ██║'}</Text>
-        <Text color="claude">{'██║ ╚═╝ ██║ ██║ ██║ ╚═╝ ██║ ╚██████╔╝'}</Text>
-        <Text color="claude">{'╚═╝     ╚═╝ ╚═╝ ╚═╝     ╚═╝  ╚═════╝'}</Text>
+        <Text color="claude">{'  __  __ _ __  __  ___  '}</Text>
+        <Text color="claude">{' |  \\/  (_)  \\/  |/ _ \\ '}</Text>
+        <Text color="claude">{' | |\\/| | | |\\/| | | | |'}</Text>
+        <Text color="claude">{' | |  | | | |  | | |_| |'}</Text>
+        <Text color="claude">{' |_|  |_|_|_|  |_|\\___/ '}</Text>
       </Box>
     )
   }
