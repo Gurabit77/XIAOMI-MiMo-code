@@ -3,6 +3,9 @@
 import { homedir } from 'os'
 import { join } from 'path'
 
+// Mark as MiMo runtime (controls logo, branding, login flow)
+process.env.MIMO_CODE_RUNTIME = '1'
+
 // Isolate config: ~/.mimo instead of ~/.claude
 if (!process.env.CLAUDE_CONFIG_DIR) {
   process.env.CLAUDE_CONFIG_DIR = join(homedir(), '.mimo')

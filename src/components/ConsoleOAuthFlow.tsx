@@ -17,6 +17,7 @@ import { Select } from './CustomSelect/select.js'
 import { Spinner } from './Spinner.js'
 import TextInput from './TextInput.js'
 import { fi } from 'zod/v4/locales'
+import { isMiMoRuntime } from '../utils/mimoRuntimeConfig.js'
 
 type Props = {
   onDone(): void
@@ -445,7 +446,9 @@ function OAuthStatusMessage({
           <Text bold>
             {startingMessage
               ? startingMessage
-              : `MiMo Code can be used with your MiMo subscription or billed based on API usage through your API account.`}
+              : isMiMoRuntime()
+                ? `MiMo Code uses your MiMo Token Plan API key. Configure your endpoint below.`
+                : `MiMo Code can be used with your MiMo subscription or billed based on API usage through your API account.`}
           </Text>
 
           <Text>Select login method:</Text>
@@ -485,22 +488,11 @@ function OAuthStatusMessage({
                   ),
                   value: 'gemini_api',
                 },
-                {
+                ...(!isMiMoRuntime() ? [{
                   label: (
                     <Text>
                       MiMo account with subscription ·{' '}
                       <Text dimColor>Pro, Max, Team, or Enterprise</Text>
-                      {process.env.USER_TYPE === 'ant' && (
-                        <Text>
-                          {'\n'}
-                          <Text color="warning">[ANT-ONLY]</Text>{' '}
-                          <Text dimColor>
-                            Please use this option unless you need to login to a
-                            special org for accessing sensitive data (e.g.
-                            customer data, HIPI data) with the Console option
-                          </Text>
-                        </Text>
-                      )}
                       {'\n'}
                     </Text>
                   ),
@@ -515,8 +507,8 @@ function OAuthStatusMessage({
                     </Text>
                   ),
                   value: 'console',
-                },
-                {
+                }] : []),
+                ...(!isMiMoRuntime() ? [{
                   label: (
                     <Text>
                       3rd-party platform ·{' '}
@@ -527,7 +519,7 @@ function OAuthStatusMessage({
                     </Text>
                   ),
                   value: 'platform',
-                },
+                }] : []),
               ]}
               onChange={value => {
                 if (value === 'custom_platform') {
