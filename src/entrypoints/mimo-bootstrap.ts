@@ -1,5 +1,6 @@
 // MiMo Code bootstrap — MUST run before any other module loads.
 // Sets env vars that other modules read at init time (memoized on first access).
+import { existsSync, readFileSync } from 'fs'
 import { homedir } from 'os'
 import { join } from 'path'
 
@@ -7,23 +8,36 @@ import { join } from 'path'
 process.env.MIMO_CODE_RUNTIME = '1'
 
 // Isolate config: ~/.mimo instead of ~/.claude
+const mimoConfigDir = join(homedir(), '.mimo')
 if (!process.env.CLAUDE_CONFIG_DIR) {
-  process.env.CLAUDE_CONFIG_DIR = join(homedir(), '.mimo')
+  process.env.CLAUDE_CONFIG_DIR = mimoConfigDir
 }
 
-// Force MiMo Token Plan API
-process.env.ANTHROPIC_BASE_URL = process.env.MIMO_BASE_URL || 'https://token-plan-sgp.xiaomimimo.com/anthropic'
-// Token Plan uses "api-key" header (not x-api-key or Authorization: Bearer)
-// Set MIMO_API_KEY env var or configure in ~/.mimo/settings.json
-const mimoApiKey = process.env.MIMO_API_KEY || ''
-if (!mimoApiKey) {
-  console.error('\x1b[33m⚠ MIMO_API_KEY not set. Run with MIMO_API_KEY=tp-xxx mimo, or see docs/SETUP.md\x1b[0m')
+// Read ~/.mimo/mimo.config.json
+let fileConfig: { baseUrl?: string; apiKey?: string } = {}
+const configPath = join(mimoConfigDir, 'mimo.config.json')
+if (existsSync(configPath)) {
+  try { fileConfig = JSON.parse(readFileSync(configPath, 'utf8')) } catch {}
 }
+
+// Resolve API key: env var > config file
+const mimoApiKey = process.env.MIMO_API_KEY || fileConfig.apiKey || ''
+if (!mimoApiKey) {
+  console.error('\x1b[33m⚠ MIMO_API_KEY not set. Run /login to configure, or see docs/SETUP.md\x1b[0m')
+}
+process.env.MIMO_API_KEY = mimoApiKey
+
+// Resolve base URL: env var > config file > default
+const mimoBaseUrl = process.env.MIMO_BASE_URL || fileConfig.baseUrl || 'https://token-plan-sgp.xiaomimimo.com/anthropic'
+process.env.ANTHROPIC_BASE_URL = mimoBaseUrl
+process.env.MIMO_BASE_URL = mimoBaseUrl
+
+// Set auth headers
 process.env.ANTHROPIC_AUTH_TOKEN = mimoApiKey
 process.env.ANTHROPIC_CUSTOM_HEADERS = mimoApiKey ? `api-key: ${mimoApiKey}` : ''
 delete process.env.ANTHROPIC_API_KEY
 
-// Force MiMo models (lowercase with dots, as required by Token Plan API)
+// Force MiMo models
 process.env.ANTHROPIC_DEFAULT_HAIKU_MODEL = 'mimo-v2.5'
 process.env.ANTHROPIC_DEFAULT_SONNET_MODEL = 'mimo-v2.5'
 process.env.ANTHROPIC_DEFAULT_OPUS_MODEL = 'mimo-v2.5-pro'
