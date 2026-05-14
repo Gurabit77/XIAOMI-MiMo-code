@@ -126,8 +126,8 @@ export async function getAnthropicClient({
     if (!mimoApiKey) {
       throw new Error(getMiMoMissingApiKeyMessage())
     }
-    defaultHeaders['api-key'] = mimoApiKey
-    defaultHeaders['x-api-key'] = null
+    // MiMo uses standard Anthropic x-api-key auth
+    defaultHeaders['x-api-key'] = mimoApiKey
     defaultHeaders['Authorization'] = null
   }
 

@@ -28,19 +28,20 @@ if (!mimoApiKey) {
 process.env.MIMO_API_KEY = mimoApiKey
 
 // Resolve base URL: env var > config file > default
-const mimoBaseUrl = process.env.MIMO_BASE_URL || fileConfig.baseUrl || 'https://token-plan-sgp.xiaomimimo.com/anthropic'
+const mimoBaseUrl = process.env.MIMO_BASE_URL || fileConfig.baseUrl || 'https://token-plan-cn.xiaomimimo.com/anthropic'
 process.env.ANTHROPIC_BASE_URL = mimoBaseUrl
 process.env.MIMO_BASE_URL = mimoBaseUrl
 
-// Set auth headers
+// Standard Anthropic SDK auth: use ANTHROPIC_AUTH_TOKEN (maps to x-api-key in SDK)
 process.env.ANTHROPIC_AUTH_TOKEN = mimoApiKey
-process.env.ANTHROPIC_CUSTOM_HEADERS = mimoApiKey ? `api-key: ${mimoApiKey}` : ''
+// Do NOT set custom headers — MiMo uses standard Anthropic x-api-key auth
+delete process.env.ANTHROPIC_CUSTOM_HEADERS
 delete process.env.ANTHROPIC_API_KEY
 delete process.env.ANTHROPIC_MODEL
 
 // Force MiMo models
-process.env.ANTHROPIC_DEFAULT_HAIKU_MODEL = 'mimo-v2.5'
-process.env.ANTHROPIC_DEFAULT_SONNET_MODEL = 'mimo-v2.5'
+process.env.ANTHROPIC_DEFAULT_HAIKU_MODEL = 'mimo-v2.5-pro'
+process.env.ANTHROPIC_DEFAULT_SONNET_MODEL = 'mimo-v2.5-pro'
 process.env.ANTHROPIC_DEFAULT_OPUS_MODEL = 'mimo-v2.5-pro'
-process.env.ANTHROPIC_SMALL_FAST_MODEL = 'mimo-v2.5'
+process.env.ANTHROPIC_SMALL_FAST_MODEL = 'mimo-v2.5-pro'
 process.env.API_TIMEOUT_MS = process.env.API_TIMEOUT_MS || '3000000'

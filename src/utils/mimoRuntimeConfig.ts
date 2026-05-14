@@ -140,7 +140,7 @@ export function applyMiMoRuntimeConfig(): void {
   const apiKey = getConfiguredMiMoApiKey(config) || ''
   process.env.MIMO_API_KEY = apiKey || process.env.MIMO_API_KEY || ''
   process.env.ANTHROPIC_AUTH_TOKEN = process.env.MIMO_API_KEY
-  process.env.ANTHROPIC_CUSTOM_HEADERS = process.env.MIMO_API_KEY ? `api-key: ${process.env.MIMO_API_KEY}` : ''
+  delete process.env.ANTHROPIC_CUSTOM_HEADERS
   delete process.env.ANTHROPIC_API_KEY
   delete process.env.ANTHROPIC_MODEL
 

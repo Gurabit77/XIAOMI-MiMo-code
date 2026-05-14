@@ -228,9 +228,9 @@ export function getRuntimeMainLoopModel(params: {
  * @returns The default model setting to use
  */
 export function getDefaultMainLoopModelSetting(): ModelName | ModelAlias {
-  // MiMo Code: default to mimo-v2.5
+  // MiMo Code: default to mimo-v2.5-pro
   if (isMiMoRuntime()) {
-    return process.env.ANTHROPIC_DEFAULT_SONNET_MODEL || 'mimo-v2.5'
+    return process.env.ANTHROPIC_DEFAULT_SONNET_MODEL || 'mimo-v2.5-pro'
   }
 
   // Ants default to defaultModel from flag config, or Opus 1M if not configured

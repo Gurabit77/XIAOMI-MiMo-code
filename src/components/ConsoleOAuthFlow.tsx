@@ -715,9 +715,9 @@ function OAuthStatusMessage({
             // Apply to current process immediately
             process.env.ANTHROPIC_BASE_URL = finalVals.base_url
             process.env.ANTHROPIC_AUTH_TOKEN = finalVals.api_key
-            process.env.ANTHROPIC_CUSTOM_HEADERS = `api-key: ${finalVals.api_key}`
             process.env.MIMO_API_KEY = finalVals.api_key
             process.env.MIMO_BASE_URL = finalVals.base_url
+            delete process.env.ANTHROPIC_CUSTOM_HEADERS
             delete process.env.ANTHROPIC_API_KEY
 
             setOAuthStatus({ state: 'success' })
