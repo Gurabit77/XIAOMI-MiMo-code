@@ -1,10 +1,12 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) and other AI coding agents when working with code in this repository.
+This file provides guidance to MiMo Code (claude.ai/code) and other AI coding agents when working with code in this repository.
 
 ## Project Overview
 
-This is a **reverse-engineered / decompiled** version of Anthropic's official Claude Code CLI tool. The goal is to restore core functionality while trimming secondary capabilities. Many modules are stubbed or feature-flagged off. TypeScript strict mode is enforced — **`bunx tsc --noEmit` must pass with zero errors**.
+**MiMo Code** is a terminal AI coding assistant powered by Xiaomi's MiMo models (V2/V2.5 series). It is based on [CCB (Claude Code Best)](https://github.com/claude-code-best/claude-code), a reverse-engineered/restored version of Anthropic's Claude Code CLI. The codebase is TypeScript strict mode — **`bunx tsc --noEmit` must pass with zero errors**.
+
+Users run `mimo` in the terminal to interact with MiMo models for coding tasks. The project maintains full configuration isolation from Claude Code (`~/.mimo/` vs `~/.claude/`).
 
 ## Git Commit Message Convention
 
@@ -20,6 +22,50 @@ This is a **reverse-engineered / decompiled** version of Anthropic's official Cl
 - `feat: 添加模型 1M 上下文切换`
 - `fix: 修复初次登陆的校验问题`
 - `chore: remove prefetchOfficialMcpUrls call on startup`
+
+## MiMo-Specific Configuration
+
+### Bootstrap Process
+
+`src/entrypoints/mimo-bootstrap.ts` runs **before any other module** and sets environment variables that other modules read at init time:
+- Sets `MIMO_CODE_RUNTIME=1` (controls logo, branding, login flow)
+- Isolates config to `~/.mimo/` via `CLAUDE_CONFIG_DIR`
+- Reads `~/.mimo/mimo.config.json` for API key and base URL
+- Forces all model slots to `mimo-v2.5-pro` via `ANTHROPIC_DEFAULT_*_MODEL` env vars
+- Sets `ANTHROPIC_AUTH_TOKEN` (maps to `x-api-key` in SDK) — MiMo uses standard Anthropic auth, NOT custom headers
+
+### API Authentication
+
+MiMo Token Plan uses `x-api-key` header (standard Anthropic SDK auth), NOT `Authorization: Bearer`. The API key is `tp-` prefixed. Configuration priority:
+1. `MIMO_API_KEY` env var
+2. `~/.mimo/mimo.config.json` → `apiKey` field
+3. `/login` command
+
+### API Endpoints
+
+| Cluster | Base URL |
+|---------|----------|
+| China (default in code) | `https://token-plan-cn.xiaomimimo.com/anthropic` |
+| Singapore | `https://token-plan-sgp.xiaomimimo.com/anthropic` |
+| Europe | `https://token-plan-ams.xiaomimimo.com/anthropic` |
+
+### Model Names
+
+All lowercase with dots: `mimo-v2.5`, `mimo-v2.5-pro`, `mimo-v2-pro`, `mimo-v2-omni`. The `/model` command only shows MiMo models (no Opus/Sonnet/Haiku).
+
+### Key Environment Variables
+
+| Variable | Purpose |
+|----------|---------|
+| `MIMO_API_KEY` | API key (`tp-` prefix) |
+| `MIMO_BASE_URL` | API endpoint override |
+| `MIMO_CONFIG_DIR` | Config directory (default `~/.mimo`) |
+| `MIMO_CONFIG_FILE` | Custom config file path |
+| `MIMO_HAIKU_MODEL` / `MIMO_SONNET_MODEL` / `MIMO_OPUS_MODEL` | Model ID overrides |
+
+### Post-Build
+
+`scripts/post-build-mimo.cjs` patches residual text in prebuilt bundles (branding, model names, paths).
 
 ## Commands
 
@@ -54,6 +100,9 @@ bun run format            # format all src/
 
 # Health check
 bun run health
+
+# Smoke check (typecheck + build + bundle + entry validation)
+bun run smoke
 
 # Check unused exports
 bun run check:unused
@@ -321,6 +370,7 @@ bun run typecheck
 
 ## Working with This Codebase
 
+- **MiMo bootstrap first** — `src/entrypoints/mimo-bootstrap.ts` is imported at the very top of `cli.tsx` and sets all MiMo env vars before anything else loads. When modifying API auth, model selection, or config paths, start here.
 - **tsc must pass** — `bun run typecheck` 必须零错误，任何修改都不能引入新的类型错误。
 - **Feature flags** — 默认全部关闭（`feature()` 返回 `false`）。Dev/build 各有自己的默认启用列表。不要在 `cli.tsx` 中重定义 `feature` 函数。
 - **React Compiler output** — Components have decompiled memoization boilerplate (`const $ = _c(N)`). This is normal.
